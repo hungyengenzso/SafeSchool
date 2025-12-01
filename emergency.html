@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khẩn Cấp - Safeschool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #adb5bd;
+            --bg-color: #f5f7fb;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .logo i {
+            font-size: 24px;
+        }
+        
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+        }
+        
+        .icon-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin: 20px 0;
+        }
+        
+        /* Content Area */
+        .content-area {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            min-height: 500px;
+        }
+        
+        .emergency-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .emergency-header h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .emergency-header p {
+            font-size: 16px;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+        
+        .location-info {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid var(--primary-light);
+        }
+        
+        .location-info p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .location-data {
+            font-weight: bold;
+            color: var(--danger);
+            font-size: 13px;
+            word-break: break-all;
+        }
+        
+        .loading {
+            text-align: center;
+            color: var(--gray);
+            padding: 20px;
+        }
+        
+        .loading i {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .emergency-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .emergency-type {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 200px;
+        }
+        
+        .emergency-type:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+            border-color: var(--danger);
+        }
+        
+        .emergency-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 12px;
+            background: linear-gradient(to right, var(--danger), #ff4d6d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .emergency-type h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+        
+        .emergency-type p {
+            color: var(--gray);
+            font-size: 13px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+        
+        /* Safety Guide Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--danger);
+        }
+        
+        .modal-header h2 {
+            color: var(--danger);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .safety-steps {
+            margin: 15px 0;
+        }
+        
+        .safety-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .step-number {
+            background: var(--danger);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+        
+        .step-content h4 {
+            margin-bottom: 5px;
+            color: var(--dark);
+            font-size: 15px;
+        }
+        
+        .step-content p {
+            color: var(--gray);
+            line-height: 1.5;
+            font-size: 13px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .continue-btn {
+            background: linear-gradient(to right, var(--success), #2ecc71);
+            color: white;
+        }
+        
+        .continue-btn:hover {
+            background: linear-gradient(to right, #219653, #27ad60);
+        }
+        
+        .cancel-btn {
+            background: var(--gray);
+            color: white;
+        }
+        
+        .cancel-btn:hover {
+            background: var(--gray-light);
+        }
+        
+        @media (max-width: 768px) {
+            .emergency-header h2 {
+                font-size: 22px;
+            }
+            
+            .emergency-header p {
+                font-size: 14px;
+            }
+            
+            .emergency-types {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .emergency-type {
+                padding: 15px;
+                min-height: 180px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 0 12px;
+            }
+            
+            .content-area {
+                padding: 15px;
+            }
+            
+            .modal-content {
+                padding: 15px;
+            }
+            
+            .logo h1 {
+                display: none;
+            }
+            
+            .logo i {
+                font-size: 22px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .emergency-header h2 {
+                font-size: 20px;
+                gap: 8px;
+            }
+            
+            .emergency-header h2 i {
+                font-size: 20px;
+            }
+            
+            .emergency-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+            }
+            
+            .emergency-type h3 {
+                font-size: 15px;
+            }
+            
+            .emergency-type p {
+                font-size: 12px;
+            }
+            
+            .location-info {
+                padding: 12px;
+            }
+            
+            .location-info p {
+                font-size: 13px;
+            }
+            
+            .location-data {
+                font-size: 12px;
+            }
+            
+            .modal-header h2 {
+                font-size: 18px;
+            }
+            
+            .modal-btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            .step-content h4 {
+                font-size: 14px;
+            }
+            
+            .step-content p {
+                font-size: 12px;
+            }
+        }
+        
+        @media (min-width: 577px) {
+            .logo h1 {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .emergency-header h2 {
+                font-size: 18px;
+            }
+            
+            .emergency-header p {
+                font-size: 13px;
+            }
+            
+            .emergency-type {
+                min-height: 170px;
+            }
+            
+            .modal-content {
+                max-height: 90vh;
+            }
+            
+            .modal-header h2 {
+                font-size: 17px;
+            }
+            
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 13px;
+            }
+            
+            .icon-btn, .back-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 15px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .content-area {
+                padding: 12px;
+            }
+            
+            .emergency-header h2 {
+                font-size: 17px;
+            }
+            
+            .emergency-type {
+                padding: 12px;
+                min-height: 160px;
+            }
+            
+            .emergency-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .modal-content {
+                padding: 12px;
+            }
+            
+            .modal-header h2 {
+                font-size: 16px;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 992px) {
+            .emergency-types {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>SafeSchool</h1>
+                </a>
+                <div class="user-info">
+                    <button class="back-btn" id="backBtn" title="Quay lại">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="header-actions">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <button class="icon-btn" id="logoutBtn" title="Đăng xuất">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="content-area">
+                <div class="emergency-header">
+                    <h2><i class="fas fa-bell"></i> Tình Huống Khẩn Cấp</h2>
+                    <p>Chọn loại tình huống bạn đang gặp phải để được hỗ trợ ngay lập tức</p>
+                </div>
+
+                <div class="location-info" id="locationInfo">
+                    <p><i class="fas fa-map-marker-alt"></i> Đang xác định vị trí của bạn...</p>
+                </div>
+
+                <div class="emergency-types">
+                    <div class="emergency-type" data-type="Bạo lực học đường">
+                        <div class="emergency-icon">
+                            <i class="fas fa-fist-raised"></i>
+                        </div>
+                        <h3>Bạo Lực Học Đường</h3>
+                        <p>Bị đánh đập, bắt nạt, đe dọa hoặc các hình thức bạo lực khác</p>
+                    </div>
+
+                    <div class="emergency-type" data-type="Xâm hại tình dục">
+                        <div class="emergency-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <h3>Xâm Hại Tình Dục</h3>
+                        <p>Quấy rối, xâm hại hoặc có nguy cơ bị xâm hại tình dục</p>
+                    </div>
+
+                    <div class="emergency-type" data-type="Ma túy học đường">
+                        <div class="emergency-icon">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <h3>Ma Túy Học Đường</h3>
+                        <p>Phát hiện hoặc bị ép buộc sử dụng chất cấm, ma túy</p>
+                    </div>
+
+                    <div class="emergency-type" data-type="Bắt cóc, bắt giữ">
+                        <div class="emergency-icon">
+                            <i class="fas fa-handcuffs"></i>
+                        </div>
+                        <h3>Bắt Cóc, Bắt Giữ</h3>
+                        <p>Bị bắt cóc, giam giữ trái phép hoặc mất tích</p>
+                    </div>
+
+                    <div class="emergency-type" data-type="Tự tử, tự hủy hoại">
+                        <div class="emergency-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3>Tự Tử, Tự Hủy Hoại</h3>
+                        <p>Bản thân hoặc người khác có ý định tự tử, tự hủy hoại</p>
+                    </div>
+
+                    <div class="emergency-type" data-type="Khẩn cấp khác">
+                        <div class="emergency-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h3>Khẩn Cấp Khác</h3>
+                        <p>Tình huống nguy hiểm khác cần hỗ trợ khẩn cấp</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Safety Guide Modal -->
+    <div class="modal" id="safetyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-life-ring"></i> Hướng Dẫn An Toàn</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="safety-steps">
+                <div class="safety-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Tìm nơi an toàn</h4>
+                        <p>Nếu có thể, hãy di chuyển đến nơi an toàn, đông người hoặc có sự giúp đỡ.</p>
+                    </div>
+                </div>
+                
+                <div class="safety-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Giữ bình tĩnh</h4>
+                        <p>Hít thở sâu và cố gắng giữ bình tĩnh. Cộng tác viên đang trên đường hỗ trợ bạn.</p>
+                    </div>
+                </div>
+                
+                <div class="safety-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Không đối đầu</h4>
+                        <p>Tránh đối đầu trực tiếp với người gây nguy hiểm. Ưu tiên an toàn của bản thân.</p>
+                    </div>
+                </div>
+                
+                <div class="safety-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Liên lạc với người thân</h4>
+                        <p>Nếu có thể, hãy thông báo cho người thân, bạn bè hoặc giáo viên về tình huống.</p>
+                    </div>
+                </div>
+                
+                <div class="safety-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Chuẩn bị thông tin</h4>
+                        <p>Chuẩn bị mô tả về địa điểm, số lượng người và tình trạng hiện tại để cung cấp cho cộng tác viên.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" id="cancelEmergency">
+                    <i class="fas fa-times"></i> Hủy Bỏ
+                </button>
+                <button class="modal-btn continue-btn" id="continueToChat">
+                    <i class="fas fa-comments"></i> Tiếp Tục Trò Chuyện
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCq67Pm6oXQqC4hzShZyMW3XXuFdzuYeog",
+            authDomain: "blhd-ce0b8.firebaseapp.com",
+            projectId: "blhd-ce0b8",
+            storageBucket: "blhd-ce0b8.firebasestorage.app",
+            messagingSenderId: "1062247219518",
+            appId: "1:1062247219518:web:23e17dd2dd8698d46bac6f",
+            measurementId: "G-K7JLBH42RN"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let currentLocation = null;
+        let selectedEmergencyType = null;
+        let adminUserId = null;
+
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                getCurrentLocation();
+                findOrCreateAdminUser();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Back button
+        document.getElementById('backBtn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+
+        // Logout button
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        });
+
+        // Get current location with high accuracy
+        function getCurrentLocation() {
+            const locationInfo = document.getElementById('locationInfo');
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        currentLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        
+                        locationInfo.innerHTML = `
+                            <p><i class="fas fa-map-marker-alt"></i> Vị trí của bạn đã được xác định</p>
+                            <p class="location-data">Tọa độ: ${currentLocation.latitude.toFixed(6)}, ${currentLocation.longitude.toFixed(6)}</p>
+                        `;
+                    },
+                    function(error) {
+                        locationInfo.innerHTML = `
+                            <p><i class="fas fa-exclamation-triangle"></i> Không thể xác định vị trí tự động</p>
+                            <p>Vui lòng bật định vị và thử lại</p>
+                        `;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                locationInfo.innerHTML = `
+                    <p><i class="fas fa-exclamation-triangle"></i> Trình duyệt không hỗ trợ định vị</p>
+                `;
+            }
+        }
+
+        // Find or create admin user
+        function findOrCreateAdminUser() {
+            // First, try to find admin user by email
+            db.collection('users')
+                .where('email', '==', 'admin@admin.com')
+                .get()
+                .then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        // Admin user exists
+                        querySnapshot.forEach((doc) => {
+                            adminUserId = doc.id;
+                            console.log('Found admin user:', adminUserId);
+                        });
+                    } else {
+                        // Create admin user in Firestore
+                        console.log('Creating admin user in Firestore...');
+                        const adminUserRef = db.collection('users').doc();
+                        adminUserId = adminUserRef.id;
+                        
+                        adminUserRef.set({
+                            displayName: 'Cộng Tác Viên Safeschool',
+                            email: 'admin@admin.com',
+                            role: 'admin',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            isAdmin: true
+                        }).then(() => {
+                            console.log('Admin user created in Firestore:', adminUserId);
+                        }).catch((error) => {
+                            console.error('Error creating admin user:', error);
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error finding admin user:', error);
+                });
+        }
+
+        // Emergency type selection
+        document.querySelectorAll('.emergency-type').forEach(type => {
+            type.addEventListener('click', function() {
+                selectedEmergencyType = this.getAttribute('data-type');
+                document.getElementById('safetyModal').style.display = 'flex';
+            });
+        });
+
+        // Modal handlers
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('safetyModal').style.display = 'none';
+        });
+
+        document.getElementById('cancelEmergency').addEventListener('click', function() {
+            document.getElementById('safetyModal').style.display = 'none';
+            selectedEmergencyType = null;
+        });
+
+        document.getElementById('continueToChat').addEventListener('click', function() {
+            if (selectedEmergencyType && currentLocation) {
+                createEmergencyChat();
+            } else {
+                alert('Vui lòng chờ hệ thống xác định vị trí của bạn.');
+            }
+        });
+
+        // Create emergency chat with admin
+        function createEmergencyChat() {
+            if (!adminUserId) {
+                alert('Hệ thống đang tải, vui lòng thử lại sau.');
+                return;
+            }
+
+            const chatId = 'KC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+            const chatName = `KC-${selectedEmergencyType}-${chatId.substr(3, 8)}`;
+            
+            console.log('Creating emergency chat between:', currentUser.uid, 'and', adminUserId);
+            
+            // Create chat document - ONLY between current user and admin
+            db.collection('chats').doc(chatId).set({
+                name: chatName,
+                participants: [currentUser.uid, adminUserId], // ONLY 2 participants
+                createdBy: currentUser.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastMessage: `Báo cáo khẩn cấp: ${selectedEmergencyType}`,
+                lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
+                isEmergency: true,
+                emergencyData: {
+                    type: selectedEmergencyType,
+                    location: currentLocation,
+                    timestamp: new Date(),
+                    reporter: currentUser.uid,
+                    status: 'active'
+                },
+                participantNames: {
+                    [currentUser.uid]: currentUser.displayName || currentUser.email,
+                    [adminUserId]: 'Cộng Tác Viên Safeschool'
+                },
+                participantInfo: {
+                    [currentUser.uid]: {
+                        displayName: currentUser.displayName || currentUser.email,
+                        email: currentUser.email,
+                        role: 'user'
+                    },
+                    [adminUserId]: {
+                        displayName: 'Cộng Tác Viên Safeschool',
+                        email: 'admin@admin.com',
+                        role: 'admin'
+                    }
+                }
+            })
+            .then(() => {
+                console.log('Emergency chat created successfully:', chatId);
+                
+                // Add initial emergency message
+                return db.collection('chats').doc(chatId).collection('messages').add({
+                    text: `🚨 BÁO CÁO KHẨN CẤP\n\nLoại: ${selectedEmergencyType}\nVị trí: ${currentLocation.latitude.toFixed(6)}, ${currentLocation.longitude.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\n\nHệ thống đã kết nối bạn với cộng tác viên. Vui lòng mô tả chi tiết tình huống.`,
+                    senderId: 'system',
+                    senderName: 'Hệ thống Safeschool',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    isSystem: true
+                });
+            })
+            .then(() => {
+                // Add welcome message from admin
+                return db.collection('chats').doc(chatId).collection('messages').add({
+                    text: `Xin chào! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo khẩn cấp của bạn về "${selectedEmergencyType}". Hãy cho tôi biết chi tiết về tình huống bạn đang gặp phải. Chúng tôi sẽ hỗ trợ bạn ngay lập tức!`,
+                    senderId: adminUserId,
+                    senderName: 'Cộng Tác Viên Safeschool',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            })
+            .then(() => {
+                // Close modal and redirect to chat
+                document.getElementById('safetyModal').style.display = 'none';
+                alert('Đã tạo cuộc trò chuyện khẩn cấp với cộng tác viên!');
+                window.location.href = `chatbox.html`;
+            })
+            .catch((error) => {
+                console.error('Error creating emergency chat:', error);
+                alert('Có lỗi xảy ra khi tạo cuộc trò chuyện. Vui lòng thử lại.');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('safetyModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+                selectedEmergencyType = null;
+            }
+        });
+    </script>
+</body>
+</html>
