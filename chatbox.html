@@ -76,6 +76,8 @@
         .logo h1 {
             font-size: 20px;
             font-weight: 700;
+            /* Luôn hiển thị dù màn hình nhỏ hay lớn */
+            display: block !important;
         }
         
         .user-info {
@@ -533,13 +535,16 @@
         /* Responsive Styles */
         @media (max-width: 768px) {
             .sidebar {
-                position: absolute;
-                height: calc(100% - 64px);
-                top: 64px;
+                position: fixed;
+                /* SỬA Ở ĐÂY: Sidebar chạy từ đỉnh xuống đáy web */
+                height: 100vh;
+                top: 0;
+                left: 0;
                 transform: translateX(-100%);
                 width: 85%;
                 max-width: 320px;
                 z-index: 1000;
+                border-radius: 0;
             }
             
             .sidebar.open {
@@ -579,6 +584,8 @@
             }
             
             .logo h1 {
+                /* Luôn hiển thị chữ SafeSchool */
+                display: block !important;
                 font-size: 18px;
             }
             
@@ -605,13 +612,18 @@
             .message-text {
                 font-size: 13px;
             }
+            
+            .header-content {
+                padding: 0 12px;
+            }
         }
         
         @media (max-width: 576px) {
             .sidebar {
                 width: 90%;
-                height: calc(100% - 60px);
-                top: 60px;
+                max-width: 300px;
+                /* Vẫn giữ 100vh để chạy từ đỉnh xuống đáy */
+                height: 100vh;
             }
             
             .message {
@@ -636,11 +648,13 @@
             }
             
             .logo h1 {
-                display: none;
+                /* Luôn hiển thị chữ SafeSchool */
+                display: block !important;
+                font-size: 16px;
             }
             
             .header-content {
-                padding: 0 12px;
+                padding: 0 10px;
             }
             
             .sidebar-header {
@@ -677,12 +691,6 @@
             
             .no-chat-icon {
                 font-size: 40px;
-            }
-        }
-        
-        @media (min-width: 577px) {
-            .logo h1 {
-                display: block;
             }
         }
         
@@ -728,8 +736,10 @@
                 padding: 10px 0;
             }
             
-            .header-content {
-                padding: 0 10px;
+            .logo h1 {
+                /* Luôn hiển thị chữ SafeSchool */
+                display: block !important;
+                font-size: 16px;
             }
             
             .user-avatar {
@@ -790,6 +800,12 @@
                 width: 34px;
                 height: 34px;
                 font-size: 14px;
+            }
+            
+            .logo h1 {
+                /* Luôn hiển thị chữ SafeSchool */
+                display: block !important;
+                font-size: 15px;
             }
         }
         
@@ -1054,7 +1070,7 @@
             });
         }
 
-        // Select a chat to view - ĐÃ SỬA ĐỂ THÊM URL PARAMETER
+        // Select a chat to view
         function selectChat(chat) {
             // Stop previous message listener if exists
             if (currentChat && messageListeners[currentChat.id]) {
