@@ -21,6 +21,7 @@
             --bg-color: #f5f7fb;
             --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
             --transition: all 0.3s ease;
+            --sidebar-width: 400px;
         }
         
         * {
@@ -144,8 +145,9 @@
             height: calc(100vh - 64px);
         }
         
+        /* Sidebar - CẢI THIỆN GIAO DIỆN */
         .sidebar {
-            width: 400px;
+            width: var(--sidebar-width);
             background: white;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -153,24 +155,30 @@
             z-index: 1000;
             transition: transform 0.3s ease;
             flex-shrink: 0;
+            overflow: hidden;
         }
         
         .sidebar-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 15px;
+            padding: 18px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            border-bottom: 1px solid #eee;
+            background: white;
         }
         
         .sidebar-header h2 {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 18px;
-            white-space: nowrap;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary);
         }
         
         .toggle-sidebar {
@@ -200,35 +208,53 @@
             overflow: hidden;
         }
         
-        /* THANH CÔNG CỤ TÌM KIẾM VÀ LỌC */
+        /* THANH CÔNG CỤ TÌM KIẾM VÀ LỌC - CẢI THIỆN */
         .sidebar-tools {
-            padding: 12px 15px;
+            padding: 15px;
             border-bottom: 1px solid #eee;
             background: #f8f9fa;
             flex-shrink: 0;
+            transition: opacity 0.3s ease, height 0.3s ease;
+            opacity: 1;
+            height: auto;
+            overflow: hidden;
+        }
+        
+        .sidebar-tools.hidden {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            border: none;
         }
         
         .search-box {
             position: relative;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .search-box input {
             width: 100%;
-            padding: 8px 12px 8px 35px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
             outline: none;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
         
         .search-box i {
             position: absolute;
-            left: 12px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 14px;
+            color: var(--gray-light);
+            font-size: 16px;
         }
         
         .filter-options {
@@ -238,62 +264,66 @@
         }
         
         .filter-btn {
-            padding: 5px 10px;
+            padding: 6px 12px;
             border: 1px solid #ddd;
-            border-radius: 15px;
+            border-radius: 20px;
             background: white;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             transition: var(--transition);
             white-space: nowrap;
+            font-weight: 500;
         }
         
         .filter-btn:hover {
             border-color: var(--primary);
             color: var(--primary);
+            transform: translateY(-1px);
         }
         
         .filter-btn.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
+            box-shadow: 0 2px 5px rgba(67, 97, 238, 0.2);
         }
         
-        /* DANH SÁCH VẤN ĐỀ */
+        /* DANH SÁCH VẤN ĐỀ - CẢI THIỆN */
         .issues-list-container {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 0;
+            padding: 0;
             -webkit-overflow-scrolling: touch;
         }
         
         .issues-list {
-            padding: 0 15px;
+            padding: 0;
         }
         
         .issue-item {
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 15px;
+            margin: 0;
             background: white;
-            border-radius: 8px;
-            border: 1px solid #eee;
+            border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
+            position: relative;
         }
         
         .issue-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-color: var(--primary-light);
+            background: #f9f9f9;
         }
         
         .issue-item.active {
-            background: #e7f3ff;
-            border-color: var(--primary);
+            background: #e8f1ff;
             border-left: 4px solid var(--primary);
+        }
+        
+        .issue-item:last-child {
+            border-bottom: none;
         }
         
         .issue-status {
@@ -302,6 +332,7 @@
             border-radius: 50%;
             margin-top: 3px;
             flex-shrink: 0;
+            position: relative;
         }
         
         .issue-status.active {
@@ -326,12 +357,12 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         
         .issue-title {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 15px;
             color: var(--dark);
             white-space: nowrap;
             overflow: hidden;
@@ -340,151 +371,223 @@
         }
         
         .issue-time {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--gray);
             white-space: nowrap;
             margin-left: 8px;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 10px;
         }
         
         .issue-type {
             display: inline-block;
-            padding: 2px 6px;
+            padding: 3px 8px;
             background: var(--primary-light);
             color: white;
-            border-radius: 10px;
-            font-size: 10px;
-            margin-right: 5px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 8px;
+            font-weight: 600;
         }
         
         .issue-location {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--gray);
             margin-top: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .issue-location i {
+            font-size: 12px;
         }
         
         .issue-description {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--dark);
-            margin-top: 6px;
-            line-height: 1.4;
+            margin-top: 8px;
+            line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
         
-        /* CHI TIẾT VẤN ĐỀ */
+        /* CHI TIẾT VẤN ĐỀ - CẢI THIỆN */
         .issue-details {
             flex: 1;
-            padding: 15px;
+            padding: 0;
             overflow-y: auto;
             display: none;
             -webkit-overflow-scrolling: touch;
         }
         
         .issue-details.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 15px;
+            flex-shrink: 0;
+        }
+        
+        .detail-header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .back-to-list {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .back-to-list:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-2px);
+        }
+        
+        .detail-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .detail-status-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .detail-content {
+            padding: 20px 15px;
+            flex: 1;
         }
         
         .detail-section {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
         }
         
         .detail-section h4 {
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 15px;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
         }
         
-        .detail-content {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
+        .detail-section h4 i {
+            font-size: 14px;
         }
         
         .detail-item {
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             display: flex;
             flex-wrap: wrap;
         }
         
         .detail-label {
             font-weight: 600;
-            min-width: 100px;
+            min-width: 120px;
             color: var(--gray);
-            font-size: 13px;
+            font-size: 14px;
         }
         
         .detail-value {
             flex: 1;
             color: var(--dark);
-            font-size: 13px;
+            font-size: 14px;
             word-break: break-word;
         }
         
         .notes-section {
-            margin-top: 15px;
+            margin-top: 5px;
         }
         
         .notes-list {
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             -webkit-overflow-scrolling: touch;
         }
         
         .note-item {
-            background: white;
-            padding: 8px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            border-left: 3px solid var(--primary);
-            font-size: 13px;
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-light);
         }
         
         .note-header {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 12px;
             color: var(--gray);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         
         .note-content {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--dark);
-            line-height: 1.4;
+            line-height: 1.5;
         }
         
         .add-note textarea {
             width: 100%;
-            padding: 8px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             resize: vertical;
-            min-height: 60px;
-            margin-bottom: 8px;
-            font-size: 13px;
+            min-height: 80px;
+            margin-bottom: 12px;
+            font-size: 14px;
             font-family: inherit;
+            transition: var(--transition);
+        }
+        
+        .add-note textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            outline: none;
         }
         
         .action-buttons {
             display: flex;
-            gap: 8px;
-            margin-top: 15px;
+            gap: 10px;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
         
         .action-btn {
             flex: 1;
-            padding: 10px 15px;
+            padding: 12px 15px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -495,7 +598,7 @@
             gap: 8px;
             transition: var(--transition);
             font-size: 14px;
-            min-width: 120px;
+            min-width: 140px;
         }
         
         .chat-btn {
@@ -533,77 +636,18 @@
         
         .no-issues {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             color: var(--gray);
         }
         
         .no-issues i {
-            font-size: 40px;
-            margin-bottom: 12px;
-            color: #ccc;
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #ddd;
         }
         
         .no-issues p {
-            font-size: 14px;
-        }
-        
-        .user-info-sidebar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-            flex-shrink: 0;
-        }
-        
-        .user-avatar-sidebar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        
-        .user-details {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .user-name {
-            font-weight: bold;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .user-role {
-            font-size: 12px;
-            color: var(--gray);
-        }
-        
-        .logout-btn-sidebar {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-            transition: var(--transition);
-        }
-        
-        .logout-btn-sidebar:hover {
-            background: #c0392b;
-            transform: scale(1.05);
+            font-size: 15px;
         }
         
         .map-container {
@@ -680,22 +724,22 @@
                 font-size: 22px;
             }
             
-            .sidebar-header h2 {
+            .detail-title {
                 font-size: 16px;
             }
             
             .detail-section h4 {
-                font-size: 14px;
+                font-size: 15px;
             }
             
             .detail-label, .detail-value {
-                font-size: 12px;
+                font-size: 13px;
             }
             
             .action-btn {
-                padding: 8px 12px;
+                padding: 10px 12px;
                 font-size: 13px;
-                min-width: 100px;
+                min-width: 120px;
             }
             
             .user-avatar {
@@ -709,18 +753,6 @@
                 height: 35px;
                 font-size: 15px;
             }
-            
-            .issue-item {
-                padding: 10px;
-            }
-            
-            .issue-title {
-                font-size: 13px;
-            }
-            
-            .issue-description {
-                font-size: 11px;
-            }
         }
         
         @media (max-width: 576px) {
@@ -729,24 +761,20 @@
             }
             
             .sidebar-header {
-                padding: 12px;
-            }
-            
-            .issues-list {
-                padding: 0 10px;
-            }
-            
-            .issue-details {
-                padding: 12px;
+                padding: 15px;
             }
             
             .detail-content {
-                padding: 10px;
+                padding: 15px;
+            }
+            
+            .detail-section {
+                padding: 15px;
             }
             
             .detail-label {
-                min-width: 80px;
-                font-size: 12px;
+                min-width: 100px;
+                font-size: 13px;
             }
             
             .action-buttons {
@@ -755,7 +783,7 @@
             
             .action-btn {
                 width: 100%;
-                padding: 10px;
+                padding: 12px;
             }
             
             .toggle-sidebar {
@@ -769,21 +797,6 @@
             .header-content {
                 padding: 0 12px;
             }
-            
-            .user-avatar-sidebar {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
-            
-            .user-name {
-                font-size: 13px;
-            }
-            
-            .logout-btn-sidebar {
-                padding: 5px 8px;
-                font-size: 11px;
-            }
         }
         
         @media (min-width: 577px) {
@@ -794,27 +807,27 @@
         
         @media (max-width: 480px) {
             .sidebar-header h2 {
-                font-size: 15px;
+                font-size: 16px;
             }
             
             .note-item {
-                font-size: 12px;
+                font-size: 13px;
             }
             
             .note-content {
-                font-size: 12px;
+                font-size: 13px;
             }
             
             .add-note textarea {
-                font-size: 12px;
+                font-size: 13px;
             }
             
             .no-issues i {
-                font-size: 35px;
+                font-size: 40px;
             }
             
             .no-issues p {
-                font-size: 13px;
+                font-size: 14px;
             }
             
             .container {
@@ -826,12 +839,12 @@
             }
             
             .sidebar-tools {
-                padding: 10px 12px;
+                padding: 12px;
             }
             
             .filter-btn {
-                font-size: 11px;
-                padding: 4px 8px;
+                font-size: 12px;
+                padding: 5px 10px;
             }
         }
         
@@ -841,20 +854,20 @@
             }
             
             .sidebar-header h2 {
-                font-size: 14px;
+                font-size: 15px;
             }
             
             .detail-section h4 {
-                font-size: 13px;
+                font-size: 14px;
             }
             
             .detail-label {
-                min-width: 70px;
-                font-size: 11px;
+                min-width: 90px;
+                font-size: 12px;
             }
             
             .detail-value {
-                font-size: 11px;
+                font-size: 12px;
             }
             
             .toggle-sidebar {
@@ -871,8 +884,8 @@
             }
             
             .action-btn {
-                font-size: 12px;
-                padding: 8px 10px;
+                font-size: 13px;
+                padding: 10px;
             }
         }
         
@@ -933,13 +946,13 @@
         /* Loading state */
         .loading-issues {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
             color: var(--gray);
         }
         
         .loading-issues i {
             font-size: 30px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: var(--primary);
             animation: spin 1s linear infinite;
         }
@@ -947,6 +960,18 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* Badge for emergency status */
+        .emergency-badge {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -976,16 +1001,17 @@
 
     <div class="container">
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fas fa-map-marked-alt"></i> Vấn Đề Đang Xảy Ra</h2>
+            <!-- Header cố định với tiêu đề danh sách -->
+            <div class="sidebar-header" id="sidebarHeader">
+                <h2><i class="fas fa-list"></i> Danh sách vấn đề</h2>
             </div>
 
             <div class="sidebar-content">
                 <!-- Thanh công cụ tìm kiếm và lọc -->
-                <div class="sidebar-tools">
+                <div class="sidebar-tools" id="sidebarTools">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchIssues" placeholder="Tìm kiếm vấn đề...">
+                        <input type="text" id="searchIssues" placeholder="Tìm kiếm...">
                     </div>
                     <div class="filter-options">
                         <button class="filter-btn active" data-filter="all">Tất cả</button>
@@ -1009,24 +1035,27 @@
 
                 <!-- Chi tiết vấn đề (ẩn mặc định) -->
                 <div class="issue-details" id="issueDetails">
-                    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <button class="back-to-list" style="background: none; border: none; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 14px;">
-                            <i class="fas fa-arrow-left"></i> Quay lại danh sách
-                        </button>
-                        <div style="font-weight: bold; color: var(--primary);">
-                            <i class="fas fa-info-circle"></i> Chi tiết vấn đề
+                    <!-- Header của chi tiết vấn đề -->
+                    <div class="detail-header">
+                        <div class="detail-header-content">
+                            <button class="back-to-list" id="backToListBtn" title="Quay lại danh sách">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div class="detail-title" id="detailTitle">Chi tiết vấn đề</div>
+                            <div class="detail-status-badge" id="detailStatusBadge">Đang xử lý</div>
                         </div>
                     </div>
                     
-                    <div class="detail-section">
-                        <h4><i class="fas fa-info-circle"></i> Thông Tin Sự Việc</h4>
-                        <div class="detail-content">
+                    <!-- Nội dung chi tiết -->
+                    <div class="detail-content">
+                        <div class="detail-section">
+                            <h4><i class="fas fa-info-circle"></i> Thông Tin Sự Việc</h4>
                             <div class="detail-item">
-                                <span class="detail-label">Loại:</span>
+                                <span class="detail-label">Loại vấn đề:</span>
                                 <span class="detail-value" id="detailType">-</span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">Thời gian:</span>
+                                <span class="detail-label">Thời gian báo cáo:</span>
                                 <span class="detail-value" id="detailTime">-</span>
                             </div>
                             <div class="detail-item">
@@ -1042,11 +1071,9 @@
                                 <span class="detail-value" id="detailStatus">-</span>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="detail-section">
-                        <h4><i class="fas fa-user"></i> Người Báo Cáo</h4>
-                        <div class="detail-content">
+                        <div class="detail-section">
+                            <h4><i class="fas fa-user"></i> Người Báo Cáo</h4>
                             <div class="detail-item">
                                 <span class="detail-label">Tên:</span>
                                 <span class="detail-value" id="detailReporter">-</span>
@@ -1056,45 +1083,40 @@
                                 <span class="detail-value" id="detailReporterEmail">-</span>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="notes-section">
-                        <h4><i class="fas fa-sticky-note"></i> Ghi Chú</h4>
-                        <div class="notes-list" id="notesList">
-                            <!-- Notes will be populated here -->
-                            <div class="note-item">Chưa có ghi chú nào</div>
+                        <div class="detail-section notes-section">
+                            <h4><i class="fas fa-sticky-note"></i> Ghi Chú</h4>
+                            <div class="notes-list" id="notesList">
+                                <!-- Notes will be populated here -->
+                                <div class="note-item">
+                                    <div class="note-header">
+                                        <span>Hệ thống</span>
+                                        <span>Vừa xong</span>
+                                    </div>
+                                    <div class="note-content">Chưa có ghi chú nào được thêm vào</div>
+                                </div>
+                            </div>
+                            <div class="add-note">
+                                <textarea id="newNote" placeholder="Nhập ghi chú mới..."></textarea>
+                                <button class="action-btn chat-btn" id="addNoteBtn">
+                                    <i class="fas fa-plus"></i> Thêm Ghi Chú
+                                </button>
+                            </div>
                         </div>
-                        <div class="add-note">
-                            <textarea id="newNote" placeholder="Thêm ghi chú mới..."></textarea>
-                            <button class="action-btn chat-btn" id="addNoteBtn">
-                                <i class="fas fa-plus"></i> Thêm Ghi Chú
+
+                        <div class="action-buttons">
+                            <button class="action-btn chat-btn" id="goToChatBtn">
+                                <i class="fas fa-comments"></i> Đến Cuộc Trò Chuyện
+                            </button>
+                            <button class="action-btn resolve-btn" id="resolveBtn">
+                                <i class="fas fa-check"></i> Giải Quyết
+                            </button>
+                            <button class="action-btn delete-btn" id="deleteBtn">
+                                <i class="fas fa-trash"></i> Xóa Vấn Đề
                             </button>
                         </div>
                     </div>
-
-                    <div class="action-buttons">
-                        <button class="action-btn chat-btn" id="goToChatBtn">
-                            <i class="fas fa-comments"></i> Đến Cuộc Trò Chuyện
-                        </button>
-                        <button class="action-btn resolve-btn" id="resolveBtn">
-                            <i class="fas fa-check"></i> Giải Quyết
-                        </button>
-                        <button class="action-btn delete-btn" id="deleteBtn">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
-                    </div>
                 </div>
-            </div>
-
-            <div class="user-info-sidebar">
-                <div class="user-avatar-sidebar" id="userAvatar">A</div>
-                <div class="user-details">
-                    <div class="user-name" id="userDisplayName">Cộng Tác Viên</div>
-                    <div class="user-role">Quản trị viên</div>
-                </div>
-                <button class="logout-btn-sidebar" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
             </div>
         </div>
 
@@ -1139,8 +1161,6 @@
         auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('userDisplayName').textContent = user.displayName || user.email;
-                document.getElementById('userAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                 document.getElementById('userAvatarHeader').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                 
                 // Check if user is admin
@@ -1155,13 +1175,7 @@
             window.location.href = 'index.html';
         });
 
-        // Logout buttons
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            auth.signOut().then(() => {
-                window.location.href = 'login.html';
-            });
-        });
-
+        // Logout button
         document.getElementById('logoutBtnHeader').addEventListener('click', function() {
             auth.signOut().then(() => {
                 window.location.href = 'login.html';
@@ -1171,6 +1185,11 @@
         // Toggle sidebar for mobile
         document.getElementById('toggleSidebar').addEventListener('click', toggleSidebar);
         document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+
+        // Back to list button in detail view
+        document.getElementById('backToListBtn').addEventListener('click', function() {
+            showIssuesList();
+        });
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -1388,7 +1407,7 @@
                     const lat = issueData.location.lat || issueData.location.latitude;
                     const lng = issueData.location.lng || issueData.location.longitude;
                     if (lat && lng) {
-                        issueLocation.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                        issueLocation.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
                     } else {
                         issueLocation.textContent = 'Vị trí không xác định';
                     }
@@ -1433,9 +1452,8 @@
                 }
             });
             
-            // Show details panel
-            document.getElementById('issuesListContainer').style.display = 'none';
-            document.getElementById('issueDetails').classList.add('active');
+            // Show details view and hide list
+            showIssueDetails(issue);
             
             // Update issue details
             updateIssueDetails(issue);
@@ -1458,6 +1476,28 @@
                 document.getElementById('sidebar').classList.add('open');
                 document.getElementById('sidebarOverlay').classList.add('active');
             }
+        }
+
+        // Show issue details view
+        function showIssueDetails(issue) {
+            document.getElementById('issuesListContainer').style.display = 'none';
+            document.getElementById('issueDetails').classList.add('active');
+            document.getElementById('sidebarTools').classList.add('hidden');
+            document.getElementById('sidebarHeader').innerHTML = `<h2><i class="fas fa-info-circle"></i> Chi tiết vấn đề</h2>`;
+        }
+
+        // Show issues list view
+        function showIssuesList() {
+            document.getElementById('issuesListContainer').style.display = 'block';
+            document.getElementById('issueDetails').classList.remove('active');
+            document.getElementById('sidebarTools').classList.remove('hidden');
+            document.getElementById('sidebarHeader').innerHTML = `<h2><i class="fas fa-list"></i> Danh sách vấn đề</h2>`;
+            
+            // Clear selected issue
+            selectedIssue = null;
+            document.querySelectorAll('.issue-item').forEach(item => {
+                item.classList.remove('active');
+            });
         }
 
         // Update map markers
@@ -1578,24 +1618,26 @@
             });
         }
 
-        // Back to list button
-        document.querySelector('.back-to-list').addEventListener('click', function() {
-            document.getElementById('issuesListContainer').style.display = 'block';
-            document.getElementById('issueDetails').classList.remove('active');
-            
-            // Clear selected issue
-            selectedIssue = null;
-            document.querySelectorAll('.issue-item').forEach(item => {
-                item.classList.remove('active');
-            });
-        });
-
         // Update issue details
         function updateIssueDetails(issue) {
             const issueData = issue.isEmergency ? issue.emergencyData : issue.reportData;
             
             if (!issueData) return;
             
+            // Update title
+            document.getElementById('detailTitle').textContent = issue.name || `Vấn đề ${issue.id.substring(0, 8)}`;
+            
+            // Update status badge
+            const statusBadge = document.getElementById('detailStatusBadge');
+            if (issueData.status === 'resolved') {
+                statusBadge.textContent = 'Đã giải quyết';
+                statusBadge.style.background = 'rgba(76, 201, 240, 0.8)';
+            } else {
+                statusBadge.textContent = 'Đang xử lý';
+                statusBadge.style.background = issue.isEmergency ? 'rgba(247, 37, 133, 0.8)' : 'rgba(248, 150, 30, 0.8)';
+            }
+            
+            // Update details
             document.getElementById('detailType').textContent = issueData.type || 'Không xác định';
             document.getElementById('detailTime').textContent = formatTime(issueData.timestamp);
             
@@ -1637,7 +1679,15 @@
                 .get()
                 .then((querySnapshot) => {
                     if (querySnapshot.empty) {
-                        notesList.innerHTML = '<div class="note-item">Chưa có ghi chú nào</div>';
+                        notesList.innerHTML = `
+                            <div class="note-item">
+                                <div class="note-header">
+                                    <span>Hệ thống</span>
+                                    <span>Vừa xong</span>
+                                </div>
+                                <div class="note-content">Chưa có ghi chú nào được thêm vào</div>
+                            </div>
+                        `;
                         return;
                     }
 
@@ -1682,7 +1732,6 @@
             .then(() => {
                 document.getElementById('newNote').value = '';
                 loadNotes(selectedIssue.id);
-                alert('Đã thêm ghi chú thành công');
             })
             .catch((error) => {
                 console.error('Error adding note:', error);
@@ -1690,7 +1739,7 @@
             });
         });
 
-        // Go to chat - CHỨC NĂNG QUAN TRỌNG: Chuyển đến chatbox với chat cụ thể
+        // Go to chat
         document.getElementById('goToChatBtn').addEventListener('click', function() {
             if (!selectedIssue) {
                 alert('Vui lòng chọn một vấn đề trước');
@@ -1749,8 +1798,7 @@
                         alert('Đã xóa vấn đề thành công');
                         
                         // Quay lại danh sách
-                        document.getElementById('issuesListContainer').style.display = 'block';
-                        document.getElementById('issueDetails').classList.remove('active');
+                        showIssuesList();
                         
                         // Xóa khỏi danh sách
                         const issueItem = document.querySelector(`.issue-item[data-issue-id="${selectedIssue.id}"]`);
@@ -1812,13 +1860,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (document.getElementById('issueDetails').classList.contains('active')) {
-                    // Quay lại danh sách
-                    document.getElementById('issuesListContainer').style.display = 'block';
-                    document.getElementById('issueDetails').classList.remove('active');
-                    selectedIssue = null;
-                    document.querySelectorAll('.issue-item').forEach(item => {
-                        item.classList.remove('active');
-                    });
+                    showIssuesList();
                 } else {
                     closeSidebar();
                 }
