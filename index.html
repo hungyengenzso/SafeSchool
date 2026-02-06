@@ -316,7 +316,6 @@
             margin-bottom: 20px;
             box-shadow: var(--card-shadow);
             border: 2px solid #e9ecef;
-            min-height: 250px;
             display: flex;
             flex-direction: column;
         }
@@ -335,16 +334,14 @@
             color: var(--primary);
         }
         
-        /* Cập nhật: Quick actions với 2 khối có tổng width = 100% */
+        /* Cập nhật: Quick actions với 2 khối hình vuông */
         .quick-actions {
             display: flex;
             gap: 15px;
-            flex: 1;
-            flex-wrap: nowrap;
-            padding-bottom: 10px;
+            width: 100%;
         }
         
-        /* Cập nhật: Action card không có hiệu ứng hover */
+        /* Cập nhật: Action card hình vuông, chiều cao bằng chiều rộng */
         .action-card {
             background-color: white;
             border-radius: 12px;
@@ -353,7 +350,7 @@
             box-shadow: var(--card-shadow);
             border: 2px solid #e9ecef;
             flex: 1; /* Cả 2 khối chia đều không gian */
-            min-height: 180px;
+            aspect-ratio: 1 / 1; /* Tạo tỷ lệ hình vuông */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -361,6 +358,16 @@
             position: relative;
             cursor: pointer;
             /* Đã bỏ hiệu ứng hover */
+        }
+        
+        /* Đảm bảo nội dung trong khối hình vuông hiển thị tốt */
+        .action-card-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
         }
         
         /* Đã bỏ hiệu ứng hover cho action-card */
@@ -427,16 +434,11 @@
         /* Responsive */
         @media (max-width: 992px) {
             .quick-actions {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
             }
             
             .action-card {
-                width: 100%;
-                flex: 0 0 calc(50% - 8px);
-            }
-            
-            .quick-actions-container {
-                min-height: 230px;
+                width: 50%;
             }
         }
         
@@ -462,7 +464,6 @@
             
             .quick-actions-container {
                 padding: 15px;
-                min-height: 220px;
             }
             
             .quick-actions-title {
@@ -480,9 +481,8 @@
         
         @media (max-width: 576px) {
             .action-card {
-                flex: 0 0 100%;
-                min-height: 140px;
                 padding: 15px;
+                min-width: 140px;
             }
             
             .action-card i {
@@ -510,7 +510,6 @@
             }
             
             .quick-actions-container {
-                min-height: auto;
                 padding: 15px;
             }
             
@@ -550,11 +549,21 @@
             }
             
             .action-card {
-                min-height: 120px;
+                padding: 12px;
+                min-width: 120px;
             }
             
-            .quick-actions-container {
-                min-height: auto;
+            .action-card h3 {
+                font-size: 15px;
+            }
+            
+            .action-card i {
+                font-size: 30px;
+                margin-bottom: 8px;
+            }
+            
+            .quick-actions {
+                gap: 10px;
             }
             
             .welcome-banner h2 {
@@ -573,16 +582,16 @@
         
         @media (max-width: 360px) {
             .action-card {
-                min-height: 110px;
-                padding: 12px;
+                padding: 10px;
+                min-width: 110px;
             }
             
             .action-card h3 {
-                font-size: 15px;
+                font-size: 14px;
             }
             
             .action-card i {
-                font-size: 30px;
+                font-size: 28px;
             }
             
             .quick-actions-container {
@@ -599,6 +608,28 @@
             
             .content-area {
                 padding: 15px;
+            }
+        }
+        
+        /* Fallback cho trình duyệt không hỗ trợ aspect-ratio */
+        @supports not (aspect-ratio: 1 / 1) {
+            .action-card::before {
+                content: '';
+                display: block;
+                padding-top: 100%; /* Tạo chiều cao bằng chiều rộng */
+            }
+            
+            .action-card-inner {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                padding: 20px;
+            }
+            
+            .action-card {
+                position: relative;
             }
         }
     </style>
@@ -657,14 +688,18 @@
                             </div>
                             <div class="quick-actions">
                                 <div class="action-card" id="reportCard">
-                                    <i class="fas fa-file-alt"></i>
-                                    <h3>Gửi báo cáo</h3>
-                                    <p>Báo cáo chi tiết về sự việc vi phạm</p>
+                                    <div class="action-card-inner">
+                                        <i class="fas fa-file-alt"></i>
+                                        <h3>Gửi báo cáo</h3>
+                                        <p>Báo cáo chi tiết về sự việc vi phạm</p>
+                                    </div>
                                 </div>
                                 <div class="action-card" id="chatCard">
-                                    <i class="fas fa-comments"></i>
-                                    <h3>Trò chuyện</h3>
-                                    <p>Trao đổi với cộng tác viên về sự việc</p>
+                                    <div class="action-card-inner">
+                                        <i class="fas fa-comments"></i>
+                                        <h3>Trò chuyện</h3>
+                                        <p>Trao đổi với cộng tác viên về sự việc</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
