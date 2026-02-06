@@ -1111,6 +1111,41 @@
             left: 0;
             border-radius: 0 5px 5px 0;
         }
+        
+        /* Custom Circle Marker Style */
+        .circle-marker {
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .circle-marker:hover {
+            transform: scale(1.2);
+            z-index: 1000;
+        }
+        
+        .circle-marker-emergency {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .circle-marker-report {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .circle-marker-resolved {
+            background-color: var(--success);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -1428,6 +1463,8 @@
                         if (userData.role === 'admin' || user.email.endsWith('@admin.com')) {
                             initMap();
                             loadIssues();
+                            // Chạy kiểm tra xóa vấn đề cũ tự động
+                            checkAndDeleteOldResolvedIssues();
                         } else {
                             alert('Bạn không có quyền truy cập trang này');
                             window.location.href = 'index.html';
@@ -1466,6 +1503,69 @@
             }
         }
 
+        // Kiểm tra và xóa các vấn đề đã giải quyết sau 3 ngày
+        function checkAndDeleteOldResolvedIssues() {
+            const threeDaysAgo = new Date();
+            threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+            
+            db.collection('chats')
+                .where('isEmergency', '==', true)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const chatData = doc.data();
+                        if (chatData.emergencyData && chatData.emergencyData.status === 'resolved') {
+                            const resolvedTime = chatData.emergencyData.resolvedAt 
+                                ? chatData.emergencyData.resolvedAt.toDate() 
+                                : chatData.emergencyData.timestamp.toDate();
+                            
+                            if (resolvedTime < threeDaysAgo) {
+                                // Xóa vấn đề đã giải quyết sau 3 ngày
+                                db.collection('chats').doc(doc.id).delete()
+                                    .then(() => {
+                                        console.log('Đã xóa vấn đề cũ:', doc.id);
+                                    })
+                                    .catch((error) => {
+                                        console.error('Lỗi khi xóa vấn đề cũ:', error);
+                                    });
+                            }
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi kiểm tra vấn đề cũ:', error);
+                });
+            
+            // Tương tự cho báo cáo
+            db.collection('chats')
+                .where('isReport', '==', true)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const chatData = doc.data();
+                        if (chatData.reportData && chatData.reportData.status === 'resolved') {
+                            const resolvedTime = chatData.reportData.resolvedAt 
+                                ? chatData.reportData.resolvedAt.toDate() 
+                                : chatData.reportData.timestamp.toDate();
+                            
+                            if (resolvedTime < threeDaysAgo) {
+                                // Xóa báo cáo đã giải quyết sau 3 ngày
+                                db.collection('chats').doc(doc.id).delete()
+                                    .then(() => {
+                                        console.log('Đã xóa báo cáo cũ:', doc.id);
+                                    })
+                                    .catch((error) => {
+                                        console.error('Lỗi khi xóa báo cáo cũ:', error);
+                                    });
+                            }
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi kiểm tra báo cáo cũ:', error);
+                });
+        }
+
         // Load issues from Firestore
         function loadIssues() {
             db.collection('chats')
@@ -1480,6 +1580,17 @@
                                 ...chatData
                             });
                         }
+                    });
+                    
+                    // Sắp xếp theo thời gian mới nhất lên đầu
+                    issues.sort((a, b) => {
+                        const aTime = a.isEmergency ? a.emergencyData?.timestamp : a.reportData?.timestamp;
+                        const bTime = b.isEmergency ? b.emergencyData?.timestamp : b.reportData?.timestamp;
+                        
+                        const aDate = aTime ? (aTime.toDate ? aTime.toDate() : new Date(aTime)) : new Date(0);
+                        const bDate = bTime ? (bTime.toDate ? bTime.toDate() : new Date(bTime)) : new Date(0);
+                        
+                        return bDate - aDate; // Mới nhất lên đầu
                     });
                     
                     // Update filtered issues and display
@@ -1515,13 +1626,7 @@
                 return true;
             });
             
-            // Sort by timestamp (newest first)
-            filteredIssues.sort((a, b) => {
-                const aTime = a.isEmergency ? a.emergencyData?.timestamp : a.reportData?.timestamp;
-                const bTime = b.isEmergency ? b.emergencyData?.timestamp : b.reportData?.timestamp;
-                return new Date(bTime) - new Date(aTime);
-            });
-            
+            // Giữ nguyên thứ tự đã sắp xếp (mới nhất lên đầu)
             displayIssuesList();
         }
 
@@ -1688,7 +1793,7 @@
             });
         }
 
-        // Update map markers
+        // Update map markers - SỬA LẠI THÀNH HÌNH TRÒN
         function updateMapMarkers() {
             // Clear existing markers
             markers.forEach(marker => map.removeLayer(marker));
@@ -1700,12 +1805,21 @@
                 
                 // Set marker color based on status
                 let markerColor = 'red';
+                let markerClass = 'circle-marker-emergency';
+                let markerIcon = '🚨';
+                
                 if (issueData.status === 'resolved') {
                     markerColor = 'green';
+                    markerClass = 'circle-marker-resolved';
+                    markerIcon = '✓';
                 } else if (issue.isEmergency) {
                     markerColor = 'red';
+                    markerClass = 'circle-marker-emergency';
+                    markerIcon = '🚨';
                 } else {
                     markerColor = 'gold';
+                    markerClass = 'circle-marker-report';
+                    markerIcon = '📋';
                 }
                 
                 // Ensure location has lat/lng properties
@@ -1715,65 +1829,37 @@
                 
                 if (!lat || !lng) return;
                 
-                // Tạo nội dung popup với ảnh nếu có
+                // Tạo nội dung popup đơn giản, không hiển thị ảnh
                 let popupContent = `
                     <div style="max-width: 250px;">
                         <b>${issue.isEmergency ? '🚨 KHẨN CẤP' : '📋 BÁO CÁO'}</b><br>
                         <b>Loại:</b> ${issueData.type || 'Không xác định'}<br>
                         <b>Thời gian:</b> ${formatTime(issueData.timestamp)}<br>
                         <b>Trạng thái:</b> ${issueData.status === 'active' ? 'Đang xử lý' : 'Đã giải quyết'}<br>
+                        <b>Mô tả:</b> ${(issueData.description || '').substring(0, 100)}${issueData.description && issueData.description.length > 100 ? '...' : ''}
+                    </div>
                 `;
                 
-                // Thêm ảnh nếu có
-                if (issueData.images && issueData.images.length > 0) {
-                    popupContent += `<hr style="margin: 8px 0;"><b>Hình ảnh:</b><br>`;
-                    issueData.images.slice(0, 2).forEach((img, index) => {
-                        popupContent += `
-                            <div style="margin: 5px 0;">
-                                <img src="${img}" 
-                                     style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 4px; cursor: pointer;" 
-                                     onclick="window.open('${img}', '_blank')"
-                                     title="Nhấp để xem ảnh lớn">
-                            </div>
-                        `;
-                    });
-                    if (issueData.images.length > 2) {
-                        popupContent += `<small>+ ${issueData.images.length - 2} ảnh khác</small>`;
-                    }
-                }
-                
-                popupContent += `</div>`;
-                
-                const marker = L.marker([lat, lng])
-                    .addTo(map)
-                    .bindPopup(popupContent);
+                // Tạo marker hình tròn tùy chỉnh
+                const circleMarker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: 'circle-marker ' + markerClass,
+                        html: markerIcon,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12],
+                        popupAnchor: [0, -12]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(popupContent);
 
-                marker.on('click', () => {
+                circleMarker.on('click', () => {
                     selectIssueFromList(issue);
                 });
 
-                // Set different colors for emergency and report
-                let iconUrl;
-                if (markerColor === 'red') {
-                    iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png';
-                } else if (markerColor === 'gold') {
-                    iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png';
-                } else {
-                    iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';
-                }
-                
-                marker.setIcon(L.icon({
-                    iconUrl: iconUrl,
-                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41]
-                }));
-
                 // Store reference to issue
-                marker.issueId = issue.id;
-                markers.push(marker);
+                circleMarker.issueId = issue.id;
+                markers.push(circleMarker);
             });
         }
 
@@ -1783,49 +1869,18 @@
                 if (marker.issueId === issueId) {
                     marker.openPopup();
                     
-                    // Add bounce animation
-                    marker.setIcon(L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                        iconSize: [30, 48],
-                        iconAnchor: [15, 48],
-                        popupAnchor: [1, -34],
-                        shadowSize: [48, 48]
-                    }));
-                    
-                    setTimeout(() => {
-                        // Revert to original icon
-                        const issue = issues.find(i => i.id === issueId);
-                        if (issue) {
-                            const issueData = issue.isEmergency ? issue.emergencyData : issue.reportData;
-                            let markerColor = 'red';
-                            if (issueData.status === 'resolved') {
-                                markerColor = 'green';
-                            } else if (issue.isEmergency) {
-                                markerColor = 'red';
-                            } else {
-                                markerColor = 'gold';
-                            }
-                            
-                            let iconUrl;
-                            if (markerColor === 'red') {
-                                iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png';
-                            } else if (markerColor === 'gold') {
-                                iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png';
-                            } else {
-                                iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';
-                            }
-                            
-                            marker.setIcon(L.icon({
-                                iconUrl: iconUrl,
-                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                iconSize: [25, 41],
-                                iconAnchor: [12, 41],
-                                popupAnchor: [1, -34],
-                                shadowSize: [41, 41]
-                            }));
-                        }
-                    }, 1000);
+                    // Add highlight effect
+                    const iconElement = marker.getElement();
+                    if (iconElement) {
+                        iconElement.style.transform = 'scale(1.3)';
+                        iconElement.style.zIndex = '1000';
+                        iconElement.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+                        
+                        setTimeout(() => {
+                            iconElement.style.transform = 'scale(1)';
+                            iconElement.style.boxShadow = 'none';
+                        }, 1000);
+                    }
                 }
             });
         }
@@ -2024,7 +2079,7 @@
             
             db.collection('chats').doc(selectedIssue.id).update({
                 [`${issueDataField}.status`]: 'resolved',
-                [`${issueDataField}.resolvedAt`]: new Date(),
+                [`${issueDataField}.resolvedAt`]: firebase.firestore.FieldValue.serverTimestamp(),
                 [`${issueDataField}.resolvedBy`]: currentUser.uid
             })
             .then(() => {
@@ -2063,7 +2118,7 @@
                         showIssuesList();
                         
                         // Xóa khỏi danh sách
-                        const issueItem = document.querySelector(`.issue-item[data-issue-id="${selectedIssue.id}"]`);
+                        const issueItem = document.querySelector(`.issue-item[data-issueId="${selectedIssue.id}"]`);
                         if (issueItem) {
                             issueItem.remove();
                         }
