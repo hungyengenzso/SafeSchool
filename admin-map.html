@@ -38,15 +38,18 @@
             overflow: hidden;
         }
         
-        /* Header */
+        /* Header - CẢI THIỆN Z-INDEX */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             padding: 12px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 1002; /* Tăng z-index để header nằm trên map */
+            height: 64px;
         }
         
         .header-content {
@@ -142,7 +145,8 @@
         
         .container {
             display: flex;
-            height: calc(100vh - 64px);
+            height: 100vh;
+            padding-top: 64px; /* Đẩy nội dung xuống dưới header */
         }
         
         /* Sidebar - CẢI THIỆN GIAO DIỆN */
@@ -152,10 +156,11 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            z-index: 1000;
+            z-index: 1001;
             transition: transform 0.3s ease;
             flex-shrink: 0;
             overflow: hidden;
+            position: relative;
         }
         
         .sidebar-header {
@@ -181,24 +186,37 @@
             color: var(--primary);
         }
         
+        /* NÚT MŨI TÊN KÉO RA KÉO VÀO */
         .toggle-sidebar {
-            background: none;
+            background: rgba(67, 97, 238, 0.9);
             border: none;
             color: white;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
             display: none;
             position: absolute;
-            left: 15px;
-            top: 12px;
-            z-index: 1001;
-            background: rgba(0,0,0,0.5);
-            border-radius: 5px;
-            padding: 8px;
-            width: 40px;
-            height: 40px;
+            left: calc(100% + 10px);
+            top: 20px;
+            z-index: 1003;
+            border-radius: 0 5px 5px 0;
+            padding: 10px 8px;
+            width: 24px;
+            height: 50px;
             align-items: center;
             justify-content: center;
+            transition: var(--transition);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .toggle-sidebar:hover {
+            background: rgba(67, 97, 238, 1);
+            width: 28px;
+        }
+        
+        .toggle-sidebar.collapsed {
+            left: 0;
+            border-radius: 0 5px 5px 0;
+            transform: translateX(0);
         }
         
         .sidebar-content {
@@ -526,6 +544,96 @@
             word-break: break-word;
         }
         
+        /* STYLE CHO ẢNH BASE64 */
+        .report-images-container {
+            margin-top: 15px;
+        }
+        
+        .report-images-title {
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .report-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .report-image-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .report-image-thumbnail:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* MODAL XEM ẢNH LỚN */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1004;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .image-modal-img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-counter {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            color: white;
+            font-size: 16px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        
         .notes-section {
             margin-top: 5px;
         }
@@ -653,6 +761,7 @@
         .map-container {
             flex: 1;
             position: relative;
+            z-index: 1; /* Đảm bảo map nằm dưới header */
         }
         
         #map {
@@ -685,14 +794,21 @@
             font-size: 18px !important;
         }
         
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px !important;
+            max-width: 280px !important;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
-                position: absolute;
-                height: 100%;
+                position: fixed;
+                height: calc(100% - 64px);
                 transform: translateX(-100%);
                 width: 90%;
                 max-width: 400px;
-                z-index: 1000;
+                z-index: 1001;
+                top: 64px;
+                bottom: 0;
             }
             
             .sidebar.open {
@@ -703,17 +819,19 @@
             .toggle-sidebar {
                 display: flex;
                 position: fixed;
-                left: 15px;
-                top: 12px;
-                z-index: 1001;
+                left: 0;
+                top: 84px;
+                z-index: 1003;
+                background: rgba(67, 97, 238, 0.9);
             }
             
-            .sidebar {
-                width: 90%;
+            .sidebar.open + .toggle-sidebar {
+                left: 90%;
+                border-radius: 0 5px 5px 0;
             }
             
             .container {
-                height: calc(100vh - 60px);
+                height: calc(100vh - 64px);
             }
             
             .logo h1 {
@@ -753,11 +871,24 @@
                 height: 35px;
                 font-size: 15px;
             }
+            
+            .report-images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            }
+            
+            .report-image-thumbnail {
+                width: 70px;
+                height: 70px;
+            }
         }
         
         @media (max-width: 576px) {
             .sidebar {
                 width: 95%;
+            }
+            
+            .sidebar.open + .toggle-sidebar {
+                left: 95%;
             }
             
             .sidebar-header {
@@ -787,11 +918,9 @@
             }
             
             .toggle-sidebar {
-                left: 10px;
-                top: 10px;
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
+                top: 74px;
+                height: 45px;
+                padding: 8px 6px;
             }
             
             .header-content {
@@ -830,14 +959,6 @@
                 font-size: 14px;
             }
             
-            .container {
-                height: calc(100vh - 58px);
-            }
-            
-            header {
-                padding: 10px 0;
-            }
-            
             .sidebar-tools {
                 padding: 12px;
             }
@@ -846,11 +967,24 @@
                 font-size: 12px;
                 padding: 5px 10px;
             }
+            
+            .report-images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+            
+            .report-image-thumbnail {
+                width: 60px;
+                height: 60px;
+            }
         }
         
         @media (max-width: 360px) {
             .sidebar {
                 width: 100%;
+            }
+            
+            .sidebar.open + .toggle-sidebar {
+                left: 100%;
             }
             
             .sidebar-header h2 {
@@ -871,12 +1005,9 @@
             }
             
             .toggle-sidebar {
-                left: 8px;
-                top: 8px;
-                width: 34px;
-                height: 34px;
-                font-size: 16px;
-                padding: 6px;
+                top: 74px;
+                height: 40px;
+                padding: 7px 5px;
             }
             
             .header-content {
@@ -886,6 +1017,15 @@
             .action-btn {
                 font-size: 13px;
                 padding: 10px;
+            }
+            
+            .report-images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            }
+            
+            .report-image-thumbnail {
+                width: 50px;
+                height: 50px;
             }
         }
         
@@ -916,27 +1056,16 @@
             background: var(--primary);
         }
         
-        /* Map marker popup responsive */
-        .leaflet-popup-content {
-            font-size: 13px !important;
-            line-height: 1.4 !important;
-            max-width: 250px !important;
-        }
-        
-        .leaflet-popup-content-wrapper {
-            border-radius: 8px !important;
-        }
-        
         /* Overlay for mobile sidebar */
         .sidebar-overlay {
             display: none;
             position: fixed;
-            top: 0;
+            top: 64px;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 1000;
         }
         
         .sidebar-overlay.active {
@@ -973,6 +1102,15 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.collapsed + .toggle-sidebar {
+            left: 0;
+            border-radius: 0 5px 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -996,7 +1134,9 @@
         </div>
     </header>
 
-    <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+    <button class="toggle-sidebar" id="toggleSidebar">
+        <i class="fas fa-chevron-right"></i>
+    </button>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="container">
@@ -1070,6 +1210,16 @@
                                 <span class="detail-label">Trạng thái:</span>
                                 <span class="detail-value" id="detailStatus">-</span>
                             </div>
+                            
+                            <!-- Hiển thị ảnh từ báo cáo -->
+                            <div class="report-images-container" id="reportImagesContainer" style="display: none;">
+                                <div class="report-images-title">
+                                    <i class="fas fa-images"></i> Hình ảnh báo cáo:
+                                </div>
+                                <div class="report-images-grid" id="reportImagesGrid">
+                                    <!-- Ảnh sẽ được thêm vào đây -->
+                                </div>
+                            </div>
                         </div>
 
                         <div class="detail-section">
@@ -1125,6 +1275,15 @@
         </div>
     </div>
 
+    <!-- Modal xem ảnh lớn -->
+    <div class="image-modal" id="imageModal">
+        <div class="image-modal-content">
+            <img class="image-modal-img" id="modalImage" src="" alt="Ảnh báo cáo">
+            <button class="close-modal" id="closeImageModal">&times;</button>
+            <div class="image-counter" id="imageCounter">1/1</div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -1156,6 +1315,8 @@
         let selectedIssue = null;
         let currentFilter = 'all';
         let currentSearch = '';
+        let currentImages = [];
+        let currentImageIndex = 0;
 
         // Check authentication and admin status
         auth.onAuthStateChanged((user) => {
@@ -1182,7 +1343,7 @@
             });
         });
 
-        // Toggle sidebar for mobile
+        // Toggle sidebar cho mobile (mũi tên kéo ra kéo vào)
         document.getElementById('toggleSidebar').addEventListener('click', toggleSidebar);
         document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
 
@@ -1191,20 +1352,46 @@
             showIssuesList();
         });
 
+        // Modal ảnh
+        document.getElementById('closeImageModal').addEventListener('click', function() {
+            document.getElementById('imageModal').style.display = 'none';
+        });
+
+        // Đóng modal khi click bên ngoài
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const icon = toggleBtn.querySelector('i');
             
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                
+                // Đổi icon mũi tên
+                if (sidebar.classList.contains('open')) {
+                    icon.className = 'fas fa-chevron-left';
+                } else {
+                    icon.className = 'fas fa-chevron-right';
+                }
+            }
         }
 
         function closeSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const icon = toggleBtn.querySelector('i');
             
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
+            icon.className = 'fas fa-chevron-right';
         }
 
         // Filter buttons
@@ -1475,6 +1662,7 @@
             if (window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.add('open');
                 document.getElementById('sidebarOverlay').classList.add('active');
+                document.getElementById('toggleSidebar').querySelector('i').className = 'fas fa-chevron-left';
             }
         }
 
@@ -1527,14 +1715,38 @@
                 
                 if (!lat || !lng) return;
                 
-                const marker = L.marker([lat, lng])
-                    .addTo(map)
-                    .bindPopup(`
+                // Tạo nội dung popup với ảnh nếu có
+                let popupContent = `
+                    <div style="max-width: 250px;">
                         <b>${issue.isEmergency ? '🚨 KHẨN CẤP' : '📋 BÁO CÁO'}</b><br>
                         <b>Loại:</b> ${issueData.type || 'Không xác định'}<br>
                         <b>Thời gian:</b> ${formatTime(issueData.timestamp)}<br>
-                        <b>Trạng thái:</b> ${issueData.status === 'active' ? 'Đang xử lý' : 'Đã giải quyết'}
-                    `);
+                        <b>Trạng thái:</b> ${issueData.status === 'active' ? 'Đang xử lý' : 'Đã giải quyết'}<br>
+                `;
+                
+                // Thêm ảnh nếu có
+                if (issueData.images && issueData.images.length > 0) {
+                    popupContent += `<hr style="margin: 8px 0;"><b>Hình ảnh:</b><br>`;
+                    issueData.images.slice(0, 2).forEach((img, index) => {
+                        popupContent += `
+                            <div style="margin: 5px 0;">
+                                <img src="${img}" 
+                                     style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 4px; cursor: pointer;" 
+                                     onclick="window.open('${img}', '_blank')"
+                                     title="Nhấp để xem ảnh lớn">
+                            </div>
+                        `;
+                    });
+                    if (issueData.images.length > 2) {
+                        popupContent += `<small>+ ${issueData.images.length - 2} ảnh khác</small>`;
+                    }
+                }
+                
+                popupContent += `</div>`;
+                
+                const marker = L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup(popupContent);
 
                 marker.on('click', () => {
                     selectIssueFromList(issue);
@@ -1665,8 +1877,58 @@
                 document.getElementById('detailReporterEmail').textContent = 'Không xác định';
             }
 
+            // Hiển thị ảnh từ báo cáo
+            displayReportImages(issueData.images || []);
+
             // Load notes
             loadNotes(issue.id);
+        }
+
+        // Display report images
+        function displayReportImages(images) {
+            const container = document.getElementById('reportImagesContainer');
+            const grid = document.getElementById('reportImagesGrid');
+            
+            // Clear existing images
+            grid.innerHTML = '';
+            currentImages = [];
+            
+            if (images && images.length > 0) {
+                container.style.display = 'block';
+                currentImages = images;
+                
+                images.forEach((imgSrc, index) => {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.position = 'relative';
+                    
+                    const img = document.createElement('img');
+                    img.className = 'report-image-thumbnail';
+                    img.src = imgSrc;
+                    img.alt = `Ảnh báo cáo ${index + 1}`;
+                    img.title = 'Nhấp để xem ảnh lớn';
+                    
+                    img.addEventListener('click', () => {
+                        openImageModal(index);
+                    });
+                    
+                    imgContainer.appendChild(img);
+                    grid.appendChild(imgContainer);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Open image modal
+        function openImageModal(index) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const imageCounter = document.getElementById('imageCounter');
+            
+            currentImageIndex = index;
+            modalImg.src = currentImages[index];
+            imageCounter.textContent = `${index + 1}/${currentImages.length}`;
+            modal.style.display = 'flex';
         }
 
         // Load notes for an issue
@@ -1859,7 +2121,10 @@
         // Handle ESC key to close sidebar or details
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (document.getElementById('issueDetails').classList.contains('active')) {
+                const imageModal = document.getElementById('imageModal');
+                if (imageModal.style.display === 'flex') {
+                    imageModal.style.display = 'none';
+                } else if (document.getElementById('issueDetails').classList.contains('active')) {
                     showIssuesList();
                 } else {
                     closeSidebar();
