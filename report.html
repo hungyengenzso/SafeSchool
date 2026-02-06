@@ -42,15 +42,18 @@
             padding: 0 15px;
         }
         
-        /* Header */
+        /* Header - CẢI THIỆN Z-INDEX */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             padding: 12px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 1002; /* Tăng z-index để header nằm trên map */
+            height: 64px;
         }
         
         .header-content {
@@ -144,6 +147,7 @@
         /* Main Content */
         .main-content {
             margin: 20px 0;
+            padding-top: 64px; /* Đẩy nội dung xuống dưới header */
         }
         
         /* Content Area */
@@ -235,6 +239,8 @@
             overflow: hidden;
             margin-bottom: 12px;
             border: 2px solid #e1e5ee;
+            position: relative;
+            z-index: 1; /* Đảm bảo map nằm dưới header */
         }
         
         .location-confirm {
@@ -322,9 +328,14 @@
             color: white;
         }
         
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background: linear-gradient(to right, #219653, #27ad60);
             transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         .reset-btn {
@@ -345,7 +356,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            z-index: 1004;
             justify-content: center;
             align-items: center;
             padding: 15px;
@@ -733,7 +744,7 @@
                         <button type="reset" class="reset-btn">
                             <i class="fas fa-redo"></i> Làm Mới
                         </button>
-                        <button type="submit" class="submit-btn">
+                        <button type="submit" class="submit-btn" id="submitBtn">
                             <i class="fas fa-paper-plane"></i> Gửi Báo Cáo
                         </button>
                     </div>
@@ -821,6 +832,7 @@
         let selectedLocation = null;
         let selectedMarker = null;
         let uploadedImages = [];
+        let isSubmitting = false; // Biến cờ để tránh gửi nhiều lần
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
@@ -1029,9 +1041,14 @@
             preview.appendChild(imageContainer);
         }
 
-        // Form submission
+        // Form submission - SỬA LỖI GỬI NHIỀU LẦN
         document.getElementById('reportForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            if (isSubmitting) {
+                alert('Đang xử lý báo cáo, vui lòng đợi...');
+                return;
+            }
 
             if (!selectedLocation) {
                 alert('Vui lòng chọn vị trí xảy ra sự việc trên bản đồ');
@@ -1040,6 +1057,12 @@
 
             const violationType = document.getElementById('violationType').value;
             const description = document.getElementById('incidentDescription').value;
+
+            // Vô hiệu hóa nút submit để tránh click nhiều lần
+            isSubmitting = true;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
             // Show safety modal
             document.getElementById('safetyModal').style.display = 'flex';
@@ -1050,9 +1073,16 @@
                 description: description,
                 additionalInfo: document.getElementById('additionalInfo').value,
                 location: selectedLocation,
-                images: uploadedImages,
+                images: uploadedImages.map(img => img.compressed), // Chỉ lưu base64
                 timestamp: new Date()
             };
+
+            // Đặt lại trạng thái nút sau 5 giây phòng trường hợp có lỗi
+            setTimeout(() => {
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
+            }, 5000);
         });
 
         // Continue to chat after safety modal
@@ -1063,19 +1093,26 @@
         // Close modal
         document.getElementById('closeModal').addEventListener('click', function() {
             document.getElementById('safetyModal').style.display = 'none';
+            
+            // Reset trạng thái nút submit
+            isSubmitting = false;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
         });
 
         // Create report chat with admin
         function createReportChat() {
             if (!adminUserId || !window.reportData) {
                 alert('Hệ thống đang tải, vui lòng thử lại sau.');
+                resetSubmitButton();
                 return;
             }
 
             const chatId = 'BC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
             const chatName = `BC-${window.reportData.violationType}-${chatId.substr(3, 8)}`;
             
-            // Create chat document
+            // Create chat document với ảnh dạng base64
             db.collection('chats').doc(chatId).set({
                 name: chatName,
                 participants: [currentUser.uid, adminUserId],
@@ -1092,7 +1129,7 @@
                     timestamp: window.reportData.timestamp,
                     reporter: currentUser.uid,
                     status: 'active',
-                    images: window.reportData.images.map(img => img.compressed)
+                    images: window.reportData.images // Lưu mảng base64
                 },
                 participantNames: {
                     [currentUser.uid]: currentUser.displayName || currentUser.email,
@@ -1134,12 +1171,37 @@
                 // Close modal and redirect to chat
                 document.getElementById('safetyModal').style.display = 'none';
                 alert('Đã gửi báo cáo và tạo cuộc trò chuyện với cộng tác viên!');
+                
+                // Reset form
+                document.getElementById('reportForm').reset();
+                document.getElementById('locationConfirm').style.display = 'none';
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('imagePreview').innerHTML = '';
+                uploadedImages = [];
+                selectedLocation = null;
+                if (selectedMarker) {
+                    map.removeLayer(selectedMarker);
+                    selectedMarker = null;
+                }
+                
+                resetSubmitButton();
+                
+                // Chuyển hướng đến chatbox
                 window.location.href = `chatbox.html`;
             })
             .catch((error) => {
                 console.error('Error creating report chat:', error);
                 alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
+                resetSubmitButton();
             });
+        }
+
+        // Function to reset submit button
+        function resetSubmitButton() {
+            isSubmitting = false;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
         }
 
         // Close modal when clicking outside
@@ -1147,6 +1209,7 @@
             const modal = document.getElementById('safetyModal');
             if (event.target === modal) {
                 modal.style.display = 'none';
+                resetSubmitButton();
             }
         });
     </script>
