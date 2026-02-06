@@ -76,6 +76,25 @@
             font-weight: 700;
         }
         
+        /* Cập nhật: Hiển thị chữ SafeSchool dù màn hình to hay nhỏ */
+        .logo h1 {
+            display: block !important;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 576px) {
+            .logo h1 {
+                font-size: 18px !important;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .logo h1 {
+                font-size: 16px !important;
+            }
+        }
+        
         .user-info {
             display: flex;
             align-items: center;
@@ -251,9 +270,9 @@
             opacity: 0.9;
         }
         
-        /* Admin Section */
+        /* Admin Section - Đã di chuyển xuống dưới cùng */
         .admin-section {
-            margin-bottom: 20px;
+            margin-top: 20px;
             display: none;
         }
         
@@ -316,55 +335,35 @@
             color: var(--primary);
         }
         
+        /* Cập nhật: Quick actions với 2 khối có tổng width = 100% */
         .quick-actions {
             display: flex;
             gap: 15px;
             flex: 1;
             flex-wrap: nowrap;
-            overflow-x: auto;
             padding-bottom: 10px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
         }
         
-        .quick-actions::-webkit-scrollbar {
-            height: 6px;
-        }
-        
-        .quick-actions::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .quick-actions::-webkit-scrollbar-thumb {
-            background: var(--primary-light);
-            border-radius: 10px;
-        }
-        
+        /* Cập nhật: Action card không có hiệu ứng hover */
         .action-card {
             background-color: white;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
             box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            cursor: pointer;
             border: 2px solid #e9ecef;
-            flex: 0 0 auto;
-            width: 180px;
+            flex: 1; /* Cả 2 khối chia đều không gian */
             min-height: 180px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
+            cursor: pointer;
+            /* Đã bỏ hiệu ứng hover */
         }
         
-        .action-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
-            border-color: var(--primary);
-        }
+        /* Đã bỏ hiệu ứng hover cho action-card */
         
         .action-card i {
             font-size: 40px;
@@ -428,13 +427,12 @@
         /* Responsive */
         @media (max-width: 992px) {
             .quick-actions {
-                flex-wrap: nowrap;
-                overflow-x: auto;
+                flex-wrap: wrap;
             }
             
             .action-card {
-                width: 170px;
-                min-height: 170px;
+                width: 100%;
+                flex: 0 0 calc(50% - 8px);
             }
             
             .quick-actions-container {
@@ -478,16 +476,12 @@
             .container {
                 padding: 0 12px;
             }
-            
-            .logo h1 {
-                font-size: 18px;
-            }
         }
         
         @media (max-width: 576px) {
             .action-card {
-                width: 160px;
-                min-height: 160px;
+                flex: 0 0 100%;
+                min-height: 140px;
                 padding: 15px;
             }
             
@@ -516,7 +510,7 @@
             }
             
             .quick-actions-container {
-                min-height: 200px;
+                min-height: auto;
                 padding: 15px;
             }
             
@@ -535,14 +529,6 @@
             
             .emergency-card p, .admin-card p {
                 font-size: 13px;
-            }
-            
-            .logo h1 {
-                display: none;
-            }
-            
-            .logo i {
-                font-size: 22px;
             }
             
             .user-avatar {
@@ -564,12 +550,11 @@
             }
             
             .action-card {
-                width: 140px;
-                min-height: 140px;
+                min-height: 120px;
             }
             
             .quick-actions-container {
-                min-height: 180px;
+                min-height: auto;
             }
             
             .welcome-banner h2 {
@@ -586,16 +571,9 @@
             }
         }
         
-        @media (min-width: 577px) {
-            .logo h1 {
-                display: block;
-            }
-        }
-        
         @media (max-width: 360px) {
             .action-card {
-                width: 130px;
-                min-height: 130px;
+                min-height: 110px;
                 padding: 12px;
             }
             
@@ -608,7 +586,6 @@
             }
             
             .quick-actions-container {
-                min-height: 170px;
                 padding: 12px;
             }
             
@@ -673,14 +650,6 @@
                             </div>
                         </div>
                         
-                        <div class="admin-section" id="adminSection">
-                            <div class="admin-card" id="adminCard">
-                                <i class="fas fa-map-marked-alt"></i>
-                                <h3>Vấn đề đang xảy ra</h3>
-                                <p>Theo dõi và quản lý các vấn đề</p>
-                            </div>
-                        </div>
-                        
                         <div class="quick-actions-container">
                             <div class="quick-actions-title">
                                 <i class="fas fa-rocket"></i>
@@ -697,6 +666,15 @@
                                     <h3>Trò chuyện</h3>
                                     <p>Trao đổi với cộng tác viên về sự việc</p>
                                 </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Đã di chuyển khối admin xuống dưới cùng -->
+                        <div class="admin-section" id="adminSection">
+                            <div class="admin-card" id="adminCard">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <h3>Vấn đề đang xảy ra</h3>
+                                <p>Theo dõi và quản lý các vấn đề</p>
                             </div>
                         </div>
                     </div>
