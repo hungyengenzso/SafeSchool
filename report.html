@@ -1058,6 +1058,12 @@
             const violationType = document.getElementById('violationType').value;
             const description = document.getElementById('incidentDescription').value;
 
+            // Kiểm tra dữ liệu bắt buộc
+            if (!violationType || !description.trim()) {
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+                return;
+            }
+
             // Vô hiệu hóa nút submit để tránh click nhiều lần
             isSubmitting = true;
             const submitBtn = document.getElementById('submitBtn');
@@ -1070,19 +1076,12 @@
             // Store form data for later use
             window.reportData = {
                 violationType: violationType,
-                description: description,
-                additionalInfo: document.getElementById('additionalInfo').value,
+                description: description.trim(),
+                additionalInfo: document.getElementById('additionalInfo').value.trim(),
                 location: selectedLocation,
                 images: uploadedImages.map(img => img.compressed), // Chỉ lưu base64
                 timestamp: new Date()
             };
-
-            // Đặt lại trạng thái nút sau 5 giây phòng trường hợp có lỗi
-            setTimeout(() => {
-                isSubmitting = false;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
-            }, 5000);
         });
 
         // Continue to chat after safety modal
@@ -1101,7 +1100,7 @@
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
         });
 
-        // Create report chat with admin
+        // Create report chat with admin - SỬA ĐỂ TRÁNH TRÙNG LẶP
         function createReportChat() {
             if (!adminUserId || !window.reportData) {
                 alert('Hệ thống đang tải, vui lòng thử lại sau.');
@@ -1109,6 +1108,35 @@
                 return;
             }
 
+            // Kiểm tra xem đã có báo cáo tương tự chưa (tránh trùng lặp)
+            const checkTimestamp = new Date(Date.now() - 30000); // 30 giây trước
+            
+            db.collection('chats')
+                .where('participants', 'array-contains', currentUser.uid)
+                .where('isReport', '==', true)
+                .where('reportData.timestamp', '>', checkTimestamp)
+                .get()
+                .then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        // Đã có báo cáo gần đây
+                        alert('Bạn đã gửi báo cáo gần đây. Vui lòng đợi một chút trước khi gửi báo cáo mới.');
+                        resetSubmitButton();
+                        document.getElementById('safetyModal').style.display = 'none';
+                        return;
+                    }
+                    
+                    // Tiếp tục tạo báo cáo mới
+                    proceedWithReportCreation();
+                })
+                .catch((error) => {
+                    console.error('Error checking duplicate reports:', error);
+                    // Nếu có lỗi, vẫn tiếp tục tạo báo cáo
+                    proceedWithReportCreation();
+                });
+        }
+
+        // Tiến hành tạo báo cáo mới
+        function proceedWithReportCreation() {
             const chatId = 'BC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
             const chatName = `BC-${window.reportData.violationType}-${chatId.substr(3, 8)}`;
             
@@ -1126,7 +1154,7 @@
                     description: window.reportData.description,
                     additionalInfo: window.reportData.additionalInfo,
                     location: window.reportData.location,
-                    timestamp: window.reportData.timestamp,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Sử dụng server timestamp
                     reporter: currentUser.uid,
                     status: 'active',
                     images: window.reportData.images // Lưu mảng base64
@@ -1151,7 +1179,7 @@
             .then(() => {
                 // Add initial report message
                 return db.collection('chats').doc(chatId).collection('messages').add({
-                    text: `📋 BÁO CÁO SỰ VIỆC\n\nLoại vi phạm: ${window.reportData.violationType}\nMô tả: ${window.reportData.description}\nVị trí: ${window.reportData.location.lat.toFixed(6)}, ${window.reportData.location.lng.toFixed(6)}\nThời gian: ${window.reportData.timestamp.toLocaleString('vi-VN')}\n\nHệ thống đã ghi nhận báo cáo của bạn. Cộng tác viên sẽ liên hệ hỗ trợ.`,
+                    text: `📋 BÁO CÁO SỰ VIỆC\n\nLoại vi phạm: ${window.reportData.violationType}\nMô tả: ${window.reportData.description}\nVị trí: ${window.reportData.location.lat.toFixed(6)}, ${window.reportData.location.lng.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\n\nHệ thống đã ghi nhận báo cáo của bạn. Cộng tác viên sẽ liên hệ hỗ trợ.`,
                     senderId: 'system',
                     senderName: 'Hệ thống Safeschool',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1173,27 +1201,31 @@
                 alert('Đã gửi báo cáo và tạo cuộc trò chuyện với cộng tác viên!');
                 
                 // Reset form
-                document.getElementById('reportForm').reset();
-                document.getElementById('locationConfirm').style.display = 'none';
-                document.getElementById('imagePreview').style.display = 'none';
-                document.getElementById('imagePreview').innerHTML = '';
-                uploadedImages = [];
-                selectedLocation = null;
-                if (selectedMarker) {
-                    map.removeLayer(selectedMarker);
-                    selectedMarker = null;
-                }
-                
-                resetSubmitButton();
+                resetForm();
                 
                 // Chuyển hướng đến chatbox
-                window.location.href = `chatbox.html`;
+                window.location.href = `chatbox.html?chatId=${chatId}`;
             })
             .catch((error) => {
                 console.error('Error creating report chat:', error);
                 alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
                 resetSubmitButton();
             });
+        }
+
+        // Function to reset form
+        function resetForm() {
+            document.getElementById('reportForm').reset();
+            document.getElementById('locationConfirm').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePreview').innerHTML = '';
+            uploadedImages = [];
+            selectedLocation = null;
+            if (selectedMarker) {
+                map.removeLayer(selectedMarker);
+                selectedMarker = null;
+            }
+            resetSubmitButton();
         }
 
         // Function to reset submit button
