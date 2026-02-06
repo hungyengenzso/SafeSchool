@@ -52,7 +52,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1002; /* Tăng z-index để header nằm trên map */
+            z-index: 1002;
             height: 64px;
         }
         
@@ -147,7 +147,7 @@
         /* Main Content */
         .main-content {
             margin: 20px 0;
-            padding-top: 64px; /* Đẩy nội dung xuống dưới header */
+            padding-top: 64px;
         }
         
         /* Content Area */
@@ -164,10 +164,11 @@
             margin-bottom: 20px;
         }
         
+        /* Đổi màu tiêu đề thành xanh */
         .report-header h2 {
             font-size: 24px;
             margin-bottom: 8px;
-            color: var(--dark);
+            color: #2a6e3f; /* Màu xanh lá đậm */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -240,11 +241,40 @@
             margin-bottom: 12px;
             border: 2px solid #e1e5ee;
             position: relative;
-            z-index: 1; /* Đảm bảo map nằm dưới header */
+            z-index: 1;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .map-control-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: white;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .map-control-btn:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.05);
         }
         
         .location-confirm {
-            display: none;
             background: #e8f5e8;
             padding: 12px;
             border-radius: 8px;
@@ -347,8 +377,8 @@
             background: var(--gray-light);
         }
         
-        /* Safety Guide Modal */
-        .modal {
+        /* Success Popup */
+        .success-popup {
             display: none;
             position: fixed;
             top: 0;
@@ -362,124 +392,91 @@
             padding: 15px;
         }
         
-        .modal-content {
+        .popup-content {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
-            max-width: 600px;
+            max-width: 500px;
             width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
+            text-align: center;
             position: relative;
             box-shadow: var(--card-shadow);
+            animation: popupShow 0.3s ease-out;
         }
         
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        @keyframes popupShow {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .popup-header {
+            margin-bottom: 20px;
+        }
+        
+        .popup-icon {
+            font-size: 48px;
+            color: #2ecc71;
             margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--warning);
         }
         
-        .modal-header h2 {
-            color: var(--warning);
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+        .popup-header h2 {
+            color: #2a6e3f;
+            font-size: 22px;
+            margin-bottom: 10px;
         }
         
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
+        .popup-body {
+            margin-bottom: 20px;
+        }
+        
+        .popup-body p {
             color: var(--gray);
-            width: 30px;
-            height: 30px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .popup-actions {
             display: flex;
-            align-items: center;
             justify-content: center;
-        }
-        
-        .safety-steps {
-            margin: 15px 0;
-        }
-        
-        .safety-step {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: #fef9e7;
-            border-radius: 8px;
-            border-left: 4px solid var(--warning);
-        }
-        
-        .step-number {
-            background: var(--warning);
-            color: white;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 12px;
-            flex-shrink: 0;
-            font-size: 13px;
-        }
-        
-        .step-content h4 {
-            margin-bottom: 5px;
-            color: var(--dark);
-            font-size: 15px;
-        }
-        
-        .step-content p {
-            color: var(--gray);
-            line-height: 1.5;
-            font-size: 13px;
-        }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
             gap: 12px;
         }
         
-        .modal-btn {
-            padding: 12px 20px;
+        .popup-btn {
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-size: 14px;
         }
         
-        .continue-btn {
-            background: linear-gradient(to right, var(--success), #2ecc71);
+        .popup-continue-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
         }
         
-        .continue-btn:hover {
-            background: linear-gradient(to right, #219653, #27ad60);
+        .popup-continue-btn:hover {
+            background: linear-gradient(to right, #3a56d4, #3730a3);
         }
         
-        .location-help, .image-help {
-            font-size: 13px;
-            color: var(--gray);
-            margin-top: 5px;
+        .popup-close-btn {
+            background: var(--gray);
+            color: white;
+        }
+        
+        .popup-close-btn:hover {
+            background: var(--gray-light);
         }
         
         @media (max-width: 768px) {
@@ -519,6 +516,15 @@
                 width: 100%;
                 justify-content: center;
             }
+            
+            .popup-content {
+                padding: 20px;
+                max-width: 90%;
+            }
+            
+            .popup-header h2 {
+                font-size: 20px;
+            }
         }
         
         @media (max-width: 576px) {
@@ -548,6 +554,17 @@
                 height: 200px;
             }
             
+            .map-controls {
+                top: 8px;
+                right: 8px;
+            }
+            
+            .map-control-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
             .image-upload {
                 padding: 15px;
             }
@@ -556,21 +573,12 @@
                 font-size: 35px;
             }
             
-            .modal-header h2 {
+            .popup-header h2 {
                 font-size: 18px;
             }
             
-            .modal-btn {
-                padding: 10px 15px;
-                font-size: 13px;
-            }
-            
-            .step-content h4 {
-                font-size: 14px;
-            }
-            
-            .step-content p {
-                font-size: 12px;
+            .popup-icon {
+                font-size: 40px;
             }
             
             .user-avatar {
@@ -601,17 +609,25 @@
                 font-size: 13px;
             }
             
-            .modal-content {
-                max-height: 90vh;
+            .popup-content {
+                max-width: 95%;
             }
             
-            .modal-header h2 {
+            .popup-header h2 {
                 font-size: 17px;
             }
             
             .image-preview img {
                 max-width: 120px;
                 max-height: 120px;
+            }
+            
+            .popup-actions {
+                flex-direction: column;
+            }
+            
+            .popup-btn {
+                width: 100%;
             }
         }
         
@@ -632,20 +648,24 @@
                 height: 180px;
             }
             
-            .modal-content {
-                padding: 12px;
-            }
-            
-            .modal-header h2 {
-                font-size: 16px;
-            }
-            
             .image-upload {
                 padding: 12px;
             }
             
             .image-upload i {
                 font-size: 30px;
+            }
+            
+            .popup-content {
+                padding: 15px;
+            }
+            
+            .popup-header h2 {
+                font-size: 16px;
+            }
+            
+            .popup-icon {
+                font-size: 36px;
             }
         }
     </style>
@@ -677,7 +697,8 @@
         <div class="main-content">
             <div class="content-area">
                 <div class="report-header">
-                    <h2><i class="fas fa-flag"></i> Báo Cáo Sự Việc</h2>
+                    <!-- Đổi màu tiêu đề thành xanh -->
+                    <h2><i class="fas fa-flag" style="color: #2a6e3f;"></i> Báo Cáo Sự Việc</h2>
                     <p>Báo cáo các vấn đề vi phạm, tệ nạn học đường với đầy đủ thông tin</p>
                 </div>
 
@@ -716,9 +737,17 @@
                         
                         <div class="form-group">
                             <label>Chọn vị trí trên bản đồ:</label>
-                            <div class="map-container" id="map"></div>
+                            <div class="map-container" id="map">
+                                <!-- Thêm nút điều khiển map -->
+                                <div class="map-controls">
+                                    <button type="button" class="map-control-btn" id="locateUserBtn" title="Vị trí hiện tại của bạn">
+                                        <i class="fas fa-location-crosshairs"></i>
+                                    </button>
+                                </div>
+                            </div>
                             <div class="location-confirm" id="locationConfirm">
                                 <p><i class="fas fa-check-circle"></i> Đã chọn vị trí: <span id="selectedLocation"></span></p>
+                                <p><small><i class="fas fa-info-circle"></i> Nếu không chọn vị trí, hệ thống sẽ tự động sử dụng vị trí hiện tại của bạn</small></p>
                                 <button type="button" class="remove-image" id="changeLocation">Thay đổi vị trí</button>
                             </div>
                             <p class="location-help"><i class="fas fa-info-circle"></i> Nhấp vào bản đồ để chọn vị trí chính xác nơi xảy ra sự việc</p>
@@ -753,51 +782,26 @@
         </div>
     </div>
 
-    <!-- Safety Guide Modal -->
-    <div class="modal" id="safetyModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-life-ring"></i> Hướng Dẫn An Toàn</h2>
-                <button class="close-modal" id="closeModal">&times;</button>
+    <!-- Success Popup -->
+    <div class="success-popup" id="successPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <div class="popup-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Báo Cáo Đã Được Gửi Thành Công!</h2>
             </div>
-            
-            <div class="safety-steps">
-                <div class="safety-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Bảo vệ thông tin cá nhân</h4>
-                        <p>Không chia sẻ thông tin cá nhân nhạy cảm với người lạ. Chỉ cung cấp thông tin cần thiết cho cộng tác viên.</p>
-                    </div>
-                </div>
-                
-                <div class="safety-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Giữ bằng chứng an toàn</h4>
-                        <p>Lưu trữ bằng chứng ở nơi an toàn và chỉ chia sẻ khi cần thiết với người có thẩm quyền.</p>
-                    </div>
-                </div>
-                
-                <div class="safety-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Liên lạc với người tin cậy</h4>
-                        <p>Thông báo cho phụ huynh, giáo viên hoặc người giám hộ về sự việc để nhận được hỗ trợ.</p>
-                    </div>
-                </div>
-                
-                <div class="safety-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4>Tuân thủ hướng dẫn</h4>
-                        <p>Làm theo hướng dẫn của cộng tác viên và không tự ý hành động khi chưa có chỉ dẫn.</p>
-                    </div>
-                </div>
+            <div class="popup-body">
+                <p>Cảm ơn bạn đã báo cáo sự việc. Hệ thống đã ghi nhận thông tin của bạn.</p>
+                <p>Một cuộc trò chuyện với cộng tác viên đã được tạo tự động.</p>
+                <p><strong>Mã báo cáo:</strong> <span id="reportCode"></span></p>
             </div>
-            
-            <div class="modal-actions">
-                <button class="modal-btn continue-btn" id="continueToChat">
-                    <i class="fas fa-comments"></i> Tiếp Tục Trò Chuyện
+            <div class="popup-actions">
+                <button class="popup-btn popup-close-btn" id="closePopup">
+                    <i class="fas fa-times"></i> Đóng
+                </button>
+                <button class="popup-btn popup-continue-btn" id="goToChat">
+                    <i class="fas fa-comments"></i> Đến Trò Chuyện
                 </button>
             </div>
         </div>
@@ -831,8 +835,10 @@
         let map = null;
         let selectedLocation = null;
         let selectedMarker = null;
+        let userLocationMarker = null;
         let uploadedImages = [];
-        let isSubmitting = false; // Biến cờ để tránh gửi nhiều lần
+        let isSubmitting = false;
+        let currentReportChatId = null;
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
@@ -890,7 +896,20 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            // Get user's current location with high accuracy
+            // Hiển thị vị trí người dùng khi bản đồ khởi tạo
+            locateUser();
+
+            // Add click event to map
+            map.on('click', function(e) {
+                setSelectedLocation(e.latlng.lat, e.latlng.lng);
+            });
+
+            // Hiển thị thông báo vị trí
+            document.getElementById('locationConfirm').style.display = 'block';
+        }
+
+        // Locate user function
+        function locateUser() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -898,16 +917,38 @@
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
                         };
+                        
+                        // Đặt vị trí hiện tại làm vị trí mặc định nếu chưa chọn
+                        if (!selectedLocation) {
+                            setSelectedLocation(userLocation.lat, userLocation.lng);
+                        }
+                        
+                        // Di chuyển bản đồ đến vị trí người dùng
                         map.setView([userLocation.lat, userLocation.lng], 15);
                         
-                        // Add marker for user's current location
-                        L.marker([userLocation.lat, userLocation.lng])
-                            .addTo(map)
-                            .bindPopup('Vị trí hiện tại của bạn')
-                            .openPopup();
+                        // Xóa marker cũ nếu có
+                        if (userLocationMarker) {
+                            map.removeLayer(userLocationMarker);
+                        }
+                        
+                        // Thêm marker vị trí hiện tại
+                        userLocationMarker = L.marker([userLocation.lat, userLocation.lng], {
+                            icon: L.divIcon({
+                                className: 'user-location-marker',
+                                html: '<div style="background-color: #4361ee; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.3);"></div>',
+                                iconSize: [16, 16]
+                            })
+                        })
+                        .addTo(map)
+                        .bindPopup('Vị trí hiện tại của bạn')
+                        .openPopup();
                     },
                     function(error) {
                         console.log('Could not get current location:', error);
+                        // Nếu không lấy được vị trí, sử dụng vị trí mặc định
+                        if (!selectedLocation) {
+                            setSelectedLocation(10.8231, 106.6297);
+                        }
                     },
                     {
                         enableHighAccuracy: true,
@@ -915,30 +956,39 @@
                         maximumAge: 60000
                     }
                 );
+            } else {
+                // Nếu trình duyệt không hỗ trợ geolocation
+                if (!selectedLocation) {
+                    setSelectedLocation(10.8231, 106.6297);
+                }
+            }
+        }
+
+        // Set selected location
+        function setSelectedLocation(lat, lng) {
+            if (selectedMarker) {
+                map.removeLayer(selectedMarker);
             }
 
-            // Add click event to map
-            map.on('click', function(e) {
-                if (selectedMarker) {
-                    map.removeLayer(selectedMarker);
-                }
+            selectedLocation = {
+                lat: lat,
+                lng: lng
+            };
 
-                selectedLocation = {
-                    lat: e.latlng.lat,
-                    lng: e.latlng.lng
-                };
+            selectedMarker = L.marker([selectedLocation.lat, selectedLocation.lng])
+                .addTo(map)
+                .bindPopup('Vị trí đã chọn')
+                .openPopup();
 
-                selectedMarker = L.marker([selectedLocation.lat, selectedLocation.lng])
-                    .addTo(map)
-                    .bindPopup('Vị trí đã chọn')
-                    .openPopup();
-
-                // Show location confirmation
-                document.getElementById('locationConfirm').style.display = 'block';
-                document.getElementById('selectedLocation').textContent = 
-                    `${selectedLocation.lat.toFixed(6)}, ${selectedLocation.lng.toFixed(6)}`;
-            });
+            // Update location confirmation text
+            document.getElementById('selectedLocation').textContent = 
+                `${selectedLocation.lat.toFixed(6)}, ${selectedLocation.lng.toFixed(6)}`;
         }
+
+        // Locate user button
+        document.getElementById('locateUserBtn').addEventListener('click', function() {
+            locateUser();
+        });
 
         // Change location handler
         document.getElementById('changeLocation').addEventListener('click', function() {
@@ -946,7 +996,6 @@
                 map.removeLayer(selectedMarker);
                 selectedMarker = null;
                 selectedLocation = null;
-                document.getElementById('locationConfirm').style.display = 'none';
             }
         });
 
@@ -1041,17 +1090,12 @@
             preview.appendChild(imageContainer);
         }
 
-        // Form submission - SỬA LỖI GỬI NHIỀU LẦN
-        document.getElementById('reportForm').addEventListener('submit', function(e) {
+        // Form submission - GỬI NGAY LẬP TỨC KHÔNG QUA MODAL AN TOÀN
+        document.getElementById('reportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             if (isSubmitting) {
                 alert('Đang xử lý báo cáo, vui lòng đợi...');
-                return;
-            }
-
-            if (!selectedLocation) {
-                alert('Vui lòng chọn vị trí xảy ra sự việc trên bản đồ');
                 return;
             }
 
@@ -1064,100 +1108,74 @@
                 return;
             }
 
+            // Nếu không chọn vị trí, tự động lấy vị trí hiện tại
+            if (!selectedLocation && userLocationMarker) {
+                const userLoc = userLocationMarker.getLatLng();
+                setSelectedLocation(userLoc.lat, userLoc.lng);
+            } else if (!selectedLocation) {
+                // Nếu không có vị trí người dùng, lấy vị trí mặc định từ bản đồ
+                const mapCenter = map.getCenter();
+                setSelectedLocation(mapCenter.lat, mapCenter.lng);
+            }
+
             // Vô hiệu hóa nút submit để tránh click nhiều lần
             isSubmitting = true;
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
-            // Show safety modal
-            document.getElementById('safetyModal').style.display = 'flex';
+            try {
+                // Gửi báo cáo ngay lập tức
+                const result = await createReportImmediately({
+                    violationType: violationType,
+                    description: description.trim(),
+                    additionalInfo: document.getElementById('additionalInfo').value.trim(),
+                    location: selectedLocation,
+                    images: uploadedImages.map(img => img.compressed),
+                    timestamp: new Date()
+                });
 
-            // Store form data for later use
-            window.reportData = {
-                violationType: violationType,
-                description: description.trim(),
-                additionalInfo: document.getElementById('additionalInfo').value.trim(),
-                location: selectedLocation,
-                images: uploadedImages.map(img => img.compressed), // Chỉ lưu base64
-                timestamp: new Date()
-            };
-        });
-
-        // Continue to chat after safety modal
-        document.getElementById('continueToChat').addEventListener('click', function() {
-            createReportChat();
-        });
-
-        // Close modal
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('safetyModal').style.display = 'none';
-            
-            // Reset trạng thái nút submit
-            isSubmitting = false;
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
-        });
-
-        // Create report chat with admin - SỬA ĐỂ TRÁNH TRÙNG LẶP
-        function createReportChat() {
-            if (!adminUserId || !window.reportData) {
-                alert('Hệ thống đang tải, vui lòng thử lại sau.');
+                // Hiển thị popup thành công
+                showSuccessPopup(result.chatId, result.reportCode);
+                
+            } catch (error) {
+                console.error('Error creating report:', error);
+                alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
                 resetSubmitButton();
-                return;
+            }
+        });
+
+        // Tạo báo cáo ngay lập tức
+        async function createReportImmediately(reportData) {
+            if (!adminUserId) {
+                throw new Error('Chưa tìm thấy cộng tác viên');
             }
 
-            // Kiểm tra xem đã có báo cáo tương tự chưa (tránh trùng lặp)
-            const checkTimestamp = new Date(Date.now() - 30000); // 30 giây trước
-            
-            db.collection('chats')
-                .where('participants', 'array-contains', currentUser.uid)
-                .where('isReport', '==', true)
-                .where('reportData.timestamp', '>', checkTimestamp)
-                .get()
-                .then((querySnapshot) => {
-                    if (!querySnapshot.empty) {
-                        // Đã có báo cáo gần đây
-                        alert('Bạn đã gửi báo cáo gần đây. Vui lòng đợi một chút trước khi gửi báo cáo mới.');
-                        resetSubmitButton();
-                        document.getElementById('safetyModal').style.display = 'none';
-                        return;
-                    }
-                    
-                    // Tiếp tục tạo báo cáo mới
-                    proceedWithReportCreation();
-                })
-                .catch((error) => {
-                    console.error('Error checking duplicate reports:', error);
-                    // Nếu có lỗi, vẫn tiếp tục tạo báo cáo
-                    proceedWithReportCreation();
-                });
-        }
-
-        // Tiến hành tạo báo cáo mới
-        function proceedWithReportCreation() {
+            // Tạo ID cho báo cáo
             const chatId = 'BC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
-            const chatName = `BC-${window.reportData.violationType}-${chatId.substr(3, 8)}`;
+            const reportCode = chatId.substr(3, 8);
             
-            // Create chat document với ảnh dạng base64
-            db.collection('chats').doc(chatId).set({
+            // Tạo tên chat
+            const chatName = `BC-${reportData.violationType}-${reportCode}`;
+            
+            // Create chat document
+            await db.collection('chats').doc(chatId).set({
                 name: chatName,
                 participants: [currentUser.uid, adminUserId],
                 createdBy: currentUser.uid,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastMessage: `Báo cáo: ${window.reportData.violationType}`,
+                lastMessage: `Báo cáo: ${reportData.violationType}`,
                 lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
                 isReport: true,
                 reportData: {
-                    type: window.reportData.violationType,
-                    description: window.reportData.description,
-                    additionalInfo: window.reportData.additionalInfo,
-                    location: window.reportData.location,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Sử dụng server timestamp
+                    type: reportData.violationType,
+                    description: reportData.description,
+                    additionalInfo: reportData.additionalInfo,
+                    location: reportData.location,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     reporter: currentUser.uid,
                     status: 'active',
-                    images: window.reportData.images // Lưu mảng base64
+                    images: reportData.images
                 },
                 participantNames: {
                     [currentUser.uid]: currentUser.displayName || currentUser.email,
@@ -1175,48 +1193,57 @@
                         role: 'admin'
                     }
                 }
-            })
-            .then(() => {
-                // Add initial report message
-                return db.collection('chats').doc(chatId).collection('messages').add({
-                    text: `📋 BÁO CÁO SỰ VIỆC\n\nLoại vi phạm: ${window.reportData.violationType}\nMô tả: ${window.reportData.description}\nVị trí: ${window.reportData.location.lat.toFixed(6)}, ${window.reportData.location.lng.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\n\nHệ thống đã ghi nhận báo cáo của bạn. Cộng tác viên sẽ liên hệ hỗ trợ.`,
-                    senderId: 'system',
-                    senderName: 'Hệ thống Safeschool',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    isSystem: true
-                });
-            })
-            .then(() => {
-                // Add welcome message from admin
-                return db.collection('chats').doc(chatId).collection('messages').add({
-                    text: `Xin chào! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo của bạn về "${window.reportData.violationType}". Cảm ơn bạn đã dũng cảm báo cáo. Hãy cho tôi biết thêm chi tiết để chúng tôi có thể hỗ trợ bạn tốt nhất.`,
-                    senderId: adminUserId,
-                    senderName: 'Cộng Tác Viên Safeschool',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            })
-            .then(() => {
-                // Close modal and redirect to chat
-                document.getElementById('safetyModal').style.display = 'none';
-                alert('Đã gửi báo cáo và tạo cuộc trò chuyện với cộng tác viên!');
-                
-                // Reset form
-                resetForm();
-                
-                // Chuyển hướng đến chatbox
-                window.location.href = `chatbox.html?chatId=${chatId}`;
-            })
-            .catch((error) => {
-                console.error('Error creating report chat:', error);
-                alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
-                resetSubmitButton();
             });
+
+            // Add initial report message
+            await db.collection('chats').doc(chatId).collection('messages').add({
+                text: `📋 BÁO CÁO SỰ VIỆC\n\nLoại vi phạm: ${reportData.violationType}\nMô tả: ${reportData.description}\nVị trí: ${reportData.location.lat.toFixed(6)}, ${reportData.location.lng.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\n\nHệ thống đã ghi nhận báo cáo của bạn. Cộng tác viên sẽ liên hệ hỗ trợ.`,
+                senderId: 'system',
+                senderName: 'Hệ thống Safeschool',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                isSystem: true
+            });
+
+            // Add welcome message from admin
+            await db.collection('chats').doc(chatId).collection('messages').add({
+                text: `Xin chào! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo của bạn về "${reportData.violationType}". Cảm ơn bạn đã dũng cảm báo cáo. Hãy cho tôi biết thêm chi tiết để chúng tôi có thể hỗ trợ bạn tốt nhất.`,
+                senderId: adminUserId,
+                senderName: 'Cộng Tác Viên Safeschool',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            return {
+                chatId: chatId,
+                reportCode: reportCode
+            };
         }
+
+        // Hiển thị popup thành công
+        function showSuccessPopup(chatId, reportCode) {
+            currentReportChatId = chatId;
+            document.getElementById('reportCode').textContent = reportCode;
+            document.getElementById('successPopup').style.display = 'flex';
+            
+            // Reset form
+            resetForm();
+        }
+
+        // Đóng popup
+        document.getElementById('closePopup').addEventListener('click', function() {
+            document.getElementById('successPopup').style.display = 'none';
+            resetSubmitButton();
+        });
+
+        // Đi đến chat
+        document.getElementById('goToChat').addEventListener('click', function() {
+            if (currentReportChatId) {
+                window.location.href = `chatbox.html?chatId=${currentReportChatId}`;
+            }
+        });
 
         // Function to reset form
         function resetForm() {
             document.getElementById('reportForm').reset();
-            document.getElementById('locationConfirm').style.display = 'none';
             document.getElementById('imagePreview').style.display = 'none';
             document.getElementById('imagePreview').innerHTML = '';
             uploadedImages = [];
@@ -1225,7 +1252,9 @@
                 map.removeLayer(selectedMarker);
                 selectedMarker = null;
             }
-            resetSubmitButton();
+            // Giữ thông báo vị trí hiển thị
+            document.getElementById('locationConfirm').style.display = 'block';
+            document.getElementById('selectedLocation').textContent = 'Chưa chọn vị trí (sẽ dùng vị trí hiện tại)';
         }
 
         // Function to reset submit button
@@ -1236,11 +1265,11 @@
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi Báo Cáo';
         }
 
-        // Close modal when clicking outside
+        // Close popup when clicking outside
         window.addEventListener('click', function(event) {
-            const modal = document.getElementById('safetyModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
+            const popup = document.getElementById('successPopup');
+            if (event.target === popup) {
+                popup.style.display = 'none';
                 resetSubmitButton();
             }
         });
