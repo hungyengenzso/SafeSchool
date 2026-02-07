@@ -323,6 +323,7 @@
             display: flex;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            gap: 10px;
         }
         
         .chat-header-info {
@@ -345,6 +346,31 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        
+        /* Nút mới trong header */
+        .admin-link-btn {
+            background: linear-gradient(to right, #9d4edd, #7b2cbf);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .admin-link-btn:hover {
+            background: linear-gradient(to right, #7b2cbf, #5a189a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .chat-messages {
@@ -616,6 +642,11 @@
             .header-content {
                 padding: 0 12px;
             }
+            
+            .admin-link-btn {
+                padding: 5px 12px;
+                font-size: 11px;
+            }
         }
         
         @media (max-width: 576px) {
@@ -691,6 +722,11 @@
             
             .no-chat-icon {
                 font-size: 40px;
+            }
+            
+            .admin-link-btn {
+                padding: 4px 10px;
+                font-size: 10px;
             }
         }
         
@@ -915,6 +951,10 @@
                     <div class="chat-title" id="currentChatName">Chọn một cuộc trò chuyện</div>
                     <div class="chat-subtitle" id="currentChatSubtitle">Để bắt đầu trò chuyện</div>
                 </div>
+                <!-- Nút mới: Chuyển tới MAP ADMIN -->
+                <button class="admin-link-btn" id="adminLinkBtn" style="display: none;">
+                    <i class="fas fa-map-marker-alt"></i> Bản đồ
+                </button>
             </div>
             
             <div class="chat-messages" id="chatMessages">
@@ -1086,6 +1126,14 @@
             
             document.getElementById('currentChatName').textContent = chat.name;
             document.getElementById('currentChatSubtitle').textContent = 'Đang trò chuyện với cộng tác viên';
+            
+            // Hiển thị nút chuyển đến MAP ADMIN
+            document.getElementById('adminLinkBtn').style.display = 'flex';
+            
+            // Cập nhật đường link của nút
+            document.getElementById('adminLinkBtn').onclick = function() {
+                window.location.href = `mapadmin.html?id=${chat.id}`;
+            };
             
             // Fix: Check if elements exist before accessing their style
             const noChatSelected = document.getElementById('noChatSelected');
