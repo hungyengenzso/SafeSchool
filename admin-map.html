@@ -544,7 +544,7 @@
             word-break: break-word;
         }
         
-        /* STYLE CHO ẢNH BASE64 */
+        /* STYLE CHO ẢNH BASE64 - ĐÃ THÊM VIỀN PHÁT SÁNG */
         .report-images-container {
             margin-top: 15px;
         }
@@ -571,12 +571,13 @@
             cursor: pointer;
             transition: var(--transition);
             border: 2px solid transparent;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
         
         .report-image-thumbnail:hover {
             transform: scale(1.05);
             border-color: var(--primary);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0 15px rgba(67, 97, 238, 0.7);
         }
         
         /* MODAL XEM ẢNH LỚN */
@@ -799,6 +800,117 @@
             max-width: 280px !important;
         }
         
+        /* MODAL XÓA VẤN ĐỀ */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1005;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .delete-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .delete-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            color: var(--danger);
+        }
+        
+        .delete-modal-header i {
+            font-size: 24px;
+        }
+        
+        .delete-modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .delete-modal-body {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: var(--dark);
+        }
+        
+        .delete-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .modal-cancel-btn {
+            background: #f0f0f0;
+            color: var(--dark);
+        }
+        
+        .modal-cancel-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .modal-delete-btn {
+            background: linear-gradient(to right, var(--danger), #ff4d6d);
+            color: white;
+        }
+        
+        .modal-delete-btn:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-2px);
+        }
+        
+        /* Style cho admin button trong chat */
+        .admin-link-btn {
+            background: linear-gradient(to right, #9d4edd, #7b2cbf);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .admin-link-btn:hover {
+            background: linear-gradient(to right, #7b2cbf, #5a189a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -879,6 +991,20 @@
             .report-image-thumbnail {
                 width: 70px;
                 height: 70px;
+            }
+            
+            .delete-modal-content {
+                padding: 20px;
+                max-width: 90%;
+            }
+            
+            .delete-modal-header h3 {
+                font-size: 18px;
+            }
+            
+            .modal-btn {
+                padding: 8px 16px;
+                font-size: 14px;
             }
         }
         
@@ -1319,6 +1445,23 @@
         </div>
     </div>
 
+    <!-- Modal xóa vấn đề -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Xác nhận xóa vấn đề</h3>
+            </div>
+            <div class="delete-modal-body" id="deleteModalBody">
+                Bạn có chắc chắn muốn xóa vấn đề này? Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan bao gồm tin nhắn, hình ảnh và ghi chú sẽ bị xóa vĩnh viễn.
+            </div>
+            <div class="delete-modal-footer">
+                <button class="modal-btn modal-cancel-btn" id="cancelDeleteBtn">Hủy</button>
+                <button class="modal-btn modal-delete-btn" id="confirmDeleteBtn">Xóa vĩnh viễn</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -1352,6 +1495,7 @@
         let currentSearch = '';
         let currentImages = [];
         let currentImageIndex = 0;
+        let issueToDelete = null;
 
         // Check authentication and admin status
         auth.onAuthStateChanged((user) => {
@@ -1398,6 +1542,19 @@
                 this.style.display = 'none';
             }
         });
+
+        // Modal xóa
+        document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+            closeDeleteModal();
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deleteIssueConfirm);
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -1465,6 +1622,8 @@
                             loadIssues();
                             // Chạy kiểm tra xóa vấn đề cũ tự động
                             checkAndDeleteOldResolvedIssues();
+                            // Kiểm tra xem có issueId trong URL không
+                            checkUrlForIssueId();
                         } else {
                             alert('Bạn không có quyền truy cập trang này');
                             window.location.href = 'index.html';
@@ -1475,6 +1634,34 @@
                     console.error('Error checking admin status:', error);
                     window.location.href = 'index.html';
                 });
+        }
+
+        // Kiểm tra URL có chứa issueId không
+        function checkUrlForIssueId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const issueId = urlParams.get('id');
+            
+            if (issueId) {
+                // Tìm issue trong danh sách
+                const checkInterval = setInterval(() => {
+                    if (issues.length > 0) {
+                        clearInterval(checkInterval);
+                        const targetIssue = issues.find(issue => issue.id === issueId);
+                        if (targetIssue) {
+                            // Chọn issue từ URL
+                            selectIssueFromList(targetIssue);
+                            // Xóa tham số từ URL
+                            const url = new URL(window.location);
+                            url.searchParams.delete('id');
+                            window.history.replaceState({}, '', url);
+                        } else {
+                            console.log('Không tìm thấy issue với ID:', issueId);
+                        }
+                    }
+                }, 100);
+                
+                setTimeout(() => clearInterval(checkInterval), 5000);
+            }
         }
 
         // Initialize map
@@ -2105,36 +2292,59 @@
             });
         });
 
-        // Delete issue
+        // Show delete modal
         document.getElementById('deleteBtn').addEventListener('click', function() {
             if (!selectedIssue) return;
-
-            if (confirm('Bạn có chắc chắn muốn xóa vấn đề này? Hành động này không thể hoàn tác.')) {
-                db.collection('chats').doc(selectedIssue.id).delete()
-                    .then(() => {
-                        alert('Đã xóa vấn đề thành công');
-                        
-                        // Quay lại danh sách
-                        showIssuesList();
-                        
-                        // Xóa khỏi danh sách
-                        const issueItem = document.querySelector(`.issue-item[data-issueId="${selectedIssue.id}"]`);
-                        if (issueItem) {
-                            issueItem.remove();
-                        }
-                        
-                        // Reset selected issue
-                        selectedIssue = null;
-                        
-                        // Cập nhật map
-                        updateMapMarkers();
-                    })
-                    .catch((error) => {
-                        console.error('Error deleting issue:', error);
-                        alert('Lỗi khi xóa vấn đề');
-                    });
-            }
+            
+            issueToDelete = selectedIssue;
+            showDeleteModal();
         });
+
+        // Show delete modal
+        function showDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'flex';
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+            issueToDelete = null;
+        }
+
+        // Delete issue confirmed
+        function deleteIssueConfirm() {
+            if (!issueToDelete) return;
+
+            db.collection('chats').doc(issueToDelete.id).delete()
+                .then(() => {
+                    closeDeleteModal();
+                    
+                    // Quay lại danh sách
+                    showIssuesList();
+                    
+                    // Xóa khỏi danh sách
+                    const issueItem = document.querySelector(`.issue-item[data-issue-id="${issueToDelete.id}"]`);
+                    if (issueItem) {
+                        issueItem.remove();
+                    }
+                    
+                    // Reset selected issue
+                    selectedIssue = null;
+                    
+                    // Cập nhật map
+                    updateMapMarkers();
+                    
+                    // Hiển thị thông báo thành công
+                    alert('Đã xóa vấn đề thành công');
+                })
+                .catch((error) => {
+                    console.error('Error deleting issue:', error);
+                    alert('Lỗi khi xóa vấn đề');
+                    closeDeleteModal();
+                });
+        }
 
         // Format time function
         function formatTime(timestamp) {
@@ -2177,8 +2387,12 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 const imageModal = document.getElementById('imageModal');
+                const deleteModal = document.getElementById('deleteModal');
+                
                 if (imageModal.style.display === 'flex') {
                     imageModal.style.display = 'none';
+                } else if (deleteModal.style.display === 'flex') {
+                    closeDeleteModal();
                 } else if (document.getElementById('issueDetails').classList.contains('active')) {
                     showIssuesList();
                 } else {
