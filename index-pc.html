@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Safeschool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --gray-dark: #495057;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --card-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+            --card-shadow-hover: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        
+        /* Header với hiệu ứng glassmorphism */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 16px 0;
+            box-shadow: 0 10px 30px -5px rgba(67, 97, 238, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+        }
+        
+        .logo:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .logo i {
+            font-size: 32px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+        
+        .logo h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: var(--transition);
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.05);
+            border-color: white;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 18px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .icon-btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin: 40px 0;
+        }
+        
+        /* Welcome Banner với hiệu ứng nâng cao */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border-radius: var(--border-radius-lg);
+            padding: 40px 50px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 30px -10px rgba(67, 97, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .welcome-banner.hidden {
+            display: none;
+        }
+        
+        .welcome-banner h2 {
+            font-size: 38px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-banner p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 600px;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .close-banner {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+            z-index: 2;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .close-banner:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+        
+        /* Grid Layout cho PC */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        /* Emergency Card - Đặt ở vị trí admin cũ */
+        .emergency-section {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+        }
+        
+        .emergency-card {
+            background: linear-gradient(135deg, var(--danger), #ff4d6d);
+            color: white;
+            border-radius: var(--border-radius-lg);
+            padding: 35px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+            box-shadow: 0 25px 35px -12px rgba(247, 37, 133, 0.4);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            min-height: 300px;
+            justify-content: center;
+        }
+        
+        .emergency-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.1) 100%);
+            pointer-events: none;
+        }
+        
+        .emergency-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 35px 45px -15px rgba(247, 37, 133, 0.5);
+        }
+        
+        .emergency-icon {
+            width: 90px;
+            height: 90px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            box-shadow: 0 15px 25px -8px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+        
+        .emergency-content h3 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .emergency-content p {
+            font-size: 16px;
+            opacity: 0.95;
+            line-height: 1.5;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+        
+        /* Quick Actions Container */
+        .quick-actions-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 35px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--gray-light);
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+        }
+        
+        .quick-actions-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: var(--dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+        
+        .quick-actions-title i {
+            color: var(--primary);
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .action-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border-radius: var(--border-radius-md);
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px -8px rgba(0,0,0,0.1);
+            border: 2px solid var(--primary-light);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--primary);
+        }
+        
+        .action-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .action-card i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: var(--transition);
+        }
+        
+        .action-card:hover i {
+            transform: scale(1.1);
+        }
+        
+        .action-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .action-card p {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        
+        /* Admin Section - Đưa xuống dưới */
+        .admin-section {
+            grid-column: 1 / -1;
+            margin-top: 0;
+        }
+        
+        .admin-card {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            color: white;
+            border-radius: var(--border-radius-lg);
+            padding: 35px 30px;
+            text-align: center;
+            box-shadow: 0 25px 35px -12px rgba(76, 201, 240, 0.4);
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admin-card::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            top: -25%;
+            right: -25%;
+            animation: rotate 15s linear infinite;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 35px 45px -15px rgba(76, 201, 240, 0.5);
+        }
+        
+        .admin-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            z-index: 1;
+        }
+        
+        .admin-content {
+            flex: 1;
+            text-align: left;
+            z-index: 1;
+        }
+        
+        .admin-content h3 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .admin-content p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 500px;
+        }
+        
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-md);
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 25px -8px rgba(0,0,0,0.08);
+            border: 1px solid var(--gray-light);
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .stat-info h4 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1a2634, #2d3a4a);
+            color: white;
+            padding: 40px 0;
+            margin-top: 60px;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Loading animation */
+        .loading-state {
+            display: none;
+            text-align: center;
+            padding: 60px;
+        }
+        
+        .loading-state.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive cho PC và các màn hình lớn */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 100%;
+                padding: 0 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .admin-card {
+                padding: 30px 25px;
+            }
+            
+            .admin-content h3 {
+                font-size: 28px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions-container {
+                grid-column: 1 / -1;
+                grid-row: auto;
+            }
+            
+            .emergency-section {
+                grid-column: 1 / -1;
+                grid-row: auto;
+            }
+            
+            .welcome-banner h2 {
+                font-size: 32px;
+            }
+            
+            .quick-actions-grid {
+                gap: 20px;
+            }
+            
+            .action-card {
+                padding: 25px 15px;
+            }
+            
+            .action-card h3 {
+                font-size: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 22px;
+            }
+            
+            .emergency-card {
+                min-height: 250px;
+                padding: 30px 20px;
+            }
+            
+            .emergency-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+            }
+            
+            .emergency-content h3 {
+                font-size: 24px;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+            
+            .welcome-banner h2 {
+                font-size: 28px;
+            }
+            
+            .welcome-banner p {
+                font-size: 16px;
+            }
+            
+            .admin-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .admin-content {
+                text-align: center;
+            }
+            
+            .admin-content h3 {
+                font-size: 26px;
+            }
+            
+            .admin-content p {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .welcome-banner {
+                padding: 30px 20px;
+            }
+            
+            .welcome-banner h2 {
+                font-size: 24px;
+            }
+            
+            .action-card {
+                padding: 20px 12px;
+            }
+            
+            .action-card i {
+                font-size: 42px;
+            }
+            
+            .action-card h3 {
+                font-size: 18px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .stat-info h4 {
+                font-size: 26px;
+            }
+            
+            .user-avatar {
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+            
+            .icon-btn {
+                width: 42px;
+                height: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <a href="index.html" class="logo">
+                        <i class="fas fa-shield-alt"></i>
+                        <h1>SafeSchool</h1>
+                    </a>
+                    <div class="user-info">
+                        <div class="header-actions">
+                            <div class="user-avatar" id="userAvatar">HS</div>
+                            <button class="icon-btn" id="logoutBtn" title="Đăng xuất">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="main-content">
+                <!-- Loading State -->
+                <div class="loading-state" id="loadingState">
+                    <div class="spinner"></div>
+                    <p style="color: var(--gray); font-size: 18px;">Đang tải dữ liệu...</p>
+                </div>
+
+                <!-- Main Content -->
+                <div id="mainContent">
+                    <!-- Welcome Banner -->
+                    <div class="welcome-banner" id="welcomeBanner">
+                        <button class="close-banner" id="closeBanner" title="Đóng banner">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <h2>Chào mừng đến với SafeSchool</h2>
+                        <p>Hệ thống báo cáo vi phạm và tệ nạn học đường an toàn, bảo mật</p>
+                    </div>
+
+                    <!-- Dashboard Grid -->
+                    <div class="dashboard-grid">
+                        <!-- Quick Actions - Hình vuông có viền -->
+                        <div class="quick-actions-container">
+                            <div class="quick-actions-title">
+                                <i class="fas fa-rocket"></i>
+                                Hành động nhanh
+                            </div>
+                            <div class="quick-actions-grid">
+                                <div class="action-card" id="reportCard">
+                                    <i class="fas fa-file-alt"></i>
+                                    <h3>Gửi báo cáo</h3>
+                                    <p>Báo cáo chi tiết về sự việc vi phạm, kèm hình ảnh và vị trí</p>
+                                </div>
+                                <div class="action-card" id="chatCard">
+                                    <i class="fas fa-comments"></i>
+                                    <h3>Trò chuyện</h3>
+                                    <p>Trao đổi trực tiếp với cộng tác viên về sự việc</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Section - Đặt ở vị trí admin cũ -->
+                        <div class="emergency-section">
+                            <div class="emergency-card" id="emergencyCard">
+                                <div class="emergency-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="emergency-content">
+                                    <h3>Báo cáo khẩn cấp</h3>
+                                    <p>Báo cáo ngay lập tức khi có tình huống nguy hiểm</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Section - Đưa xuống dưới, thay thế vị trí cũ của stats -->
+                        <div class="admin-section" id="adminSection">
+                            <div class="admin-card" id="adminCard">
+                                <div class="admin-icon">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <div class="admin-content">
+                                    <h3>Vấn đề đang xảy ra</h3>
+                                    <p>Theo dõi và quản lý các vấn đề trên bản đồ trực tiếp</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid - Cập nhật: bỏ 500+ vấn đề, thay 100+ cộng tác viên thành Cộng tác viên AI -->
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>100%</h4>
+                                <p>Bảo mật</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>24/7</h4>
+                                <p>Hỗ trợ</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Cộng tác viên AI</h4>
+                                <p>Luôn sẵn sàng hỗ trợ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>SafeSchool</span>
+                    </div>
+                    <div class="footer-links">
+                        <a href="#">Về chúng tôi</a>
+                        <a href="#">Chính sách bảo mật</a>
+                        <a href="#">Điều khoản sử dụng</a>
+                        <a href="#">Liên hệ</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCq67Pm6oXQqC4hzShZyMW3XXuFdzuYeog",
+            authDomain: "blhd-ce0b8.firebaseapp.com",
+            projectId: "blhd-ce0b8",
+            storageBucket: "blhd-ce0b8.firebasestorage.app",
+            messagingSenderId: "1062247219518",
+            appId: "1:1062247219518:web:23e17dd2dd8698d46bac6f",
+            measurementId: "G-K7JLBH42RN"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                
+                // Hiển thị nội dung chính
+                document.getElementById('loadingState').classList.remove('active');
+                document.getElementById('mainContent').style.display = 'block';
+                
+                // Check if user is admin
+                checkAdminStatus(user);
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Check if user is admin
+        function checkAdminStatus(user) {
+            // Kiểm tra email admin
+            if (user.email && user.email.endsWith('@admin.com')) {
+                document.getElementById('adminSection').style.display = 'block';
+            } else {
+                // Kiểm tra role trong Firestore
+                db.collection('users').doc(user.uid).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            if (userData.role === 'admin') {
+                                document.getElementById('adminSection').style.display = 'block';
+                            } else {
+                                document.getElementById('adminSection').style.display = 'none';
+                            }
+                        } else {
+                            document.getElementById('adminSection').style.display = 'none';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error checking admin status:', error);
+                        document.getElementById('adminSection').style.display = 'none';
+                    });
+            }
+        }
+
+        // Navigation handlers
+        document.getElementById('emergencyCard').addEventListener('click', function() {
+            window.location.href = 'emergency.html';
+        });
+
+        document.getElementById('reportCard').addEventListener('click', function() {
+            window.location.href = 'report.html';
+        });
+
+        document.getElementById('chatCard').addEventListener('click', function() {
+            window.location.href = 'chatbox.html';
+        });
+
+        // Chỉ thêm sự kiện nếu phần tử tồn tại
+        const adminCard = document.getElementById('adminCard');
+        if (adminCard) {
+            adminCard.addEventListener('click', function() {
+                window.location.href = 'admin-map.html';
+            });
+        }
+
+        // Logout button
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        });
+
+        // Request location permission on page load
+        window.addEventListener('load', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        console.log('Location access granted:', position.coords);
+                    },
+                    function(error) {
+                        console.log('Location access denied or error:', error);
+                        // Không hiển thị alert để tránh làm phiền user
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            }
+        });
+
+        // Xử lý đóng banner chào mừng
+        const closeBannerBtn = document.getElementById('closeBanner');
+        const welcomeBanner = document.getElementById('welcomeBanner');
+        
+        if (closeBannerBtn && welcomeBanner) {
+            closeBannerBtn.addEventListener('click', function() {
+                welcomeBanner.classList.add('hidden');
+                
+                // Lưu trạng thái ẩn banner vào localStorage
+                localStorage.setItem('welcomeBannerHidden', 'true');
+            });
+            
+            // Kiểm tra nếu banner đã được ẩn trước đó
+            if (localStorage.getItem('welcomeBannerHidden') === 'true') {
+                welcomeBanner.classList.add('hidden');
+            }
+        }
+
+        // Animation cho stats khi scroll vào view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card, .action-card, .admin-card, .emergency-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.5s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

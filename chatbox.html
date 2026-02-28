@@ -314,6 +314,7 @@
             display: flex;
             flex-direction: column;
             background-color: var(--bg-color);
+            min-width: 0;
         }
         
         .chat-header {
@@ -324,6 +325,7 @@
             align-items: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             gap: 10px;
+            flex-shrink: 0;
         }
         
         .chat-header-info {
@@ -373,12 +375,47 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
+        /* Nút bật/tắt AI */
+        .ai-toggle-btn {
+            background: linear-gradient(to right, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .ai-toggle-btn.ai-off {
+            background: linear-gradient(to right, #6b7280, #4b5563);
+            opacity: 0.8;
+        }
+        
+        .ai-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .ai-toggle-btn.ai-off:hover {
+            background: linear-gradient(to right, #059669, #047857);
+            opacity: 1;
+        }
+        
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
             background-color: var(--bg-color);
             -webkit-overflow-scrolling: touch;
+            will-change: scroll-position;
+            contain: content;
         }
         
         .message {
@@ -388,9 +425,11 @@
             margin-bottom: 12px;
             position: relative;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.2s ease;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         
         .message.sent {
@@ -405,6 +444,11 @@
             color: var(--dark);
             margin-right: auto;
             border-bottom-left-radius: 5px;
+        }
+        
+        .message.ai-message {
+            background-color: #e8f5e9;
+            border-left: 4px solid #10b981;
         }
         
         .message-sender {
@@ -554,7 +598,7 @@
         
         /* Animation for chat switching */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
@@ -562,7 +606,6 @@
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
-                /* SỬA Ở ĐÂY: Sidebar chạy từ đỉnh xuống đáy web */
                 height: 100vh;
                 top: 0;
                 left: 0;
@@ -610,7 +653,6 @@
             }
             
             .logo h1 {
-                /* Luôn hiển thị chữ SafeSchool */
                 display: block !important;
                 font-size: 18px;
             }
@@ -643,7 +685,7 @@
                 padding: 0 12px;
             }
             
-            .admin-link-btn {
+            .admin-link-btn, .ai-toggle-btn {
                 padding: 5px 12px;
                 font-size: 11px;
             }
@@ -653,7 +695,6 @@
             .sidebar {
                 width: 90%;
                 max-width: 300px;
-                /* Vẫn giữ 100vh để chạy từ đỉnh xuống đáy */
                 height: 100vh;
             }
             
@@ -679,7 +720,6 @@
             }
             
             .logo h1 {
-                /* Luôn hiển thị chữ SafeSchool */
                 display: block !important;
                 font-size: 16px;
             }
@@ -724,7 +764,7 @@
                 font-size: 40px;
             }
             
-            .admin-link-btn {
+            .admin-link-btn, .ai-toggle-btn {
                 padding: 4px 10px;
                 font-size: 10px;
             }
@@ -773,7 +813,6 @@
             }
             
             .logo h1 {
-                /* Luôn hiển thị chữ SafeSchool */
                 display: block !important;
                 font-size: 16px;
             }
@@ -839,7 +878,6 @@
             }
             
             .logo h1 {
-                /* Luôn hiển thị chữ SafeSchool */
                 display: block !important;
                 font-size: 15px;
             }
@@ -951,9 +989,13 @@
                     <div class="chat-title" id="currentChatName">Chọn một cuộc trò chuyện</div>
                     <div class="chat-subtitle" id="currentChatSubtitle">Để bắt đầu trò chuyện</div>
                 </div>
-                <!-- Nút mới: Chuyển tới MAP ADMIN -->
+                <!-- Nút: Chuyển tới MAP ADMIN -->
                 <button class="admin-link-btn" id="adminLinkBtn" style="display: none;">
                     <i class="fas fa-map-marker-alt"></i> Bản đồ
+                </button>
+                <!-- Nút bật/tắt AI -->
+                <button class="ai-toggle-btn" id="aiToggleBtn" style="display: none;">
+                    <i class="fas fa-robot"></i> AI: <span id="aiStatus">Bật</span>
                 </button>
             </div>
             
@@ -995,11 +1037,19 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Gemini API Key
+        const GEMINI_API_KEY = '8XWHE030UzIOHMGOX1yQhe7rTJTWfNS7DySazIA'.split('').reverse().join('');
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
+
         let currentUser = null;
         let currentChat = null;
         let chats = [];
         let messageListeners = {};
         let selectedImage = null;
+        let isAIToggling = false;
+        let processedMessageIds = new Set(); // Lưu ID các tin nhắn đã xử lý để tránh AI trả lời trùng
+        let initialMessagesLoaded = false; // Đánh dấu đã load tin nhắn lần đầu chưa
+        let isUserAdmin = false; // Biến kiểm tra user có phải admin không
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
@@ -1008,11 +1058,30 @@
                 document.getElementById('userDisplayName').textContent = user.displayName || user.email;
                 document.getElementById('userAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                 document.getElementById('userAvatarHeader').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                
+                // Kiểm tra xem user có phải admin không
+                checkIfUserIsAdminUser();
                 loadChats();
             } else {
                 window.location.href = 'login.html';
             }
         });
+
+        // Kiểm tra user có phải admin không
+        function checkIfUserIsAdminUser() {
+            db.collection('users').doc(currentUser.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        isUserAdmin = userData.email === 'admin@admin.com' || userData.role === 'admin';
+                    } else {
+                        isUserAdmin = currentUser.email === 'admin@admin.com';
+                    }
+                })
+                .catch(() => {
+                    isUserAdmin = currentUser.email === 'admin@admin.com';
+                });
+        }
 
         // Back button
         document.getElementById('backBtn').addEventListener('click', function() {
@@ -1118,6 +1187,8 @@
             }
             
             currentChat = chat;
+            initialMessagesLoaded = false;
+            processedMessageIds.clear(); // Reset processed messages khi chuyển chat
             
             // Update URL with chatId for sharing/deep linking
             const url = new URL(window.location);
@@ -1134,6 +1205,14 @@
             document.getElementById('adminLinkBtn').onclick = function() {
                 window.location.href = `admin-map.html?id=${chat.id}`;
             };
+
+            // Hiển thị nút bật/tắt AI (chỉ cho cộng tác viên)
+            if (isUserAdmin) {
+                document.getElementById('aiToggleBtn').style.display = 'flex';
+                updateAIToggleButton(chat.aiEnabled !== false);
+            } else {
+                document.getElementById('aiToggleBtn').style.display = 'none';
+            }
             
             // Fix: Check if elements exist before accessing their style
             const noChatSelected = document.getElementById('noChatSelected');
@@ -1164,62 +1243,369 @@
             }
         }
 
-        // Load messages for a chat
+        // Cập nhật giao diện nút AI
+        function updateAIToggleButton(isEnabled) {
+            const aiToggleBtn = document.getElementById('aiToggleBtn');
+            const aiStatus = document.getElementById('aiStatus');
+            
+            if (isEnabled) {
+                aiToggleBtn.classList.remove('ai-off');
+                aiStatus.textContent = 'Bật';
+            } else {
+                aiToggleBtn.classList.add('ai-off');
+                aiStatus.textContent = 'Tắt';
+            }
+        }
+
+        // Xử lý sự kiện bật/tắt AI
+        document.getElementById('aiToggleBtn').addEventListener('click', function() {
+            if (!currentChat || isAIToggling) return;
+            
+            isAIToggling = true;
+            const currentStatus = currentChat.aiEnabled !== false;
+            const newStatus = !currentStatus;
+            
+            // Cập nhật trong Firestore
+            db.collection('chats').doc(currentChat.id).update({
+                aiEnabled: newStatus
+            })
+            .then(() => {
+                currentChat.aiEnabled = newStatus;
+                updateAIToggleButton(newStatus);
+            })
+            .catch((error) => {
+                console.error('Error toggling AI:', error);
+                alert('Không thể thay đổi trạng thái AI. Vui lòng thử lại.');
+            })
+            .finally(() => {
+                isAIToggling = false;
+            });
+        });
+
+        // Hàm cuộn xuống dưới cùng
+        function scrollToBottom(smooth = true) {
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+            
+            requestAnimationFrame(() => {
+                const scrollHeight = chatMessages.scrollHeight;
+                const height = chatMessages.clientHeight;
+                const maxScroll = scrollHeight - height;
+                
+                if (smooth && maxScroll > 0) {
+                    chatMessages.scrollTo({
+                        top: maxScroll,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    chatMessages.scrollTop = maxScroll;
+                }
+            });
+        }
+
+        // Load messages for a chat - CHỈ LOAD LẦN ĐẦU, SAU ĐÓ CHỈ THÊM MỚI
         function loadMessages(chatId) {
             const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '';
             
             // Stop previous message listener if exists
             if (messageListeners[chatId]) {
                 messageListeners[chatId]();
             }
             
-            // Listen for messages in real-time
+            // Xóa hết tin nhắn cũ khi load chat mới
+            chatMessages.innerHTML = '';
+            
+            // Load lịch sử tin nhắn (chỉ load 50 tin nhắn gần nhất để tối ưu)
+            db.collection('chats')
+                .doc(chatId)
+                .collection('messages')
+                .orderBy('timestamp', 'desc')
+                .limit(50)
+                .get()
+                .then((querySnapshot) => {
+                    const messages = [];
+                    querySnapshot.forEach((doc) => {
+                        messages.unshift({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    // Hiển thị tin nhắn lịch sử
+                    messages.forEach(message => {
+                        displayMessage(message);
+                    });
+                    
+                    initialMessagesLoaded = true;
+                    
+                    // Scroll to bottom sau khi load lịch sử
+                    scrollToBottom(false);
+                    
+                    // Bắt đầu lắng nghe tin nhắn mới
+                    listenForNewMessages(chatId);
+                })
+                .catch((error) => {
+                    console.error('Error loading messages:', error);
+                });
+        }
+
+        // Lắng nghe tin nhắn mới - CHỈ THÊM KHÔNG LOẠI BỎ
+        function listenForNewMessages(chatId) {
             messageListeners[chatId] = db.collection('chats')
                 .doc(chatId)
                 .collection('messages')
                 .orderBy('timestamp', 'asc')
                 .onSnapshot((querySnapshot) => {
-                    chatMessages.innerHTML = '';
+                    // Nếu chưa load lịch sử xong thì bỏ qua
+                    if (!initialMessagesLoaded) return;
                     
-                    if (querySnapshot.empty) {
-                        const noMessages = document.createElement('div');
-                        noMessages.className = 'no-chat-selected';
-                        noMessages.innerHTML = `
-                            <i class="fas fa-comment-slash no-chat-icon"></i>
-                            <p>Chưa có tin nhắn nào trong cuộc trò chuyện này</p>
-                        `;
-                        chatMessages.appendChild(noMessages);
-                    } else {
-                        querySnapshot.forEach((doc) => {
-                            const message = doc.data();
+                    // Xử lý từng tin nhắn mới
+                    querySnapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const message = {
+                                id: change.doc.id,
+                                ...change.doc.data()
+                            };
+                            
+                            // Kiểm tra xem tin nhắn đã tồn tại chưa
+                            const existingMessage = document.querySelector(`[data-message-id="${message.id}"]`);
+                            if (existingMessage) return;
+                            
+                            // Hiển thị tin nhắn mới
                             displayMessage(message);
-                        });
-                    }
-                    
-                    // Scroll to bottom
-                    setTimeout(() => {
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }, 100);
+                            
+                            // Cuộn xuống dưới cùng nếu là tin nhắn mới
+                            const chatMessages = document.getElementById('chatMessages');
+                            const isAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop <= chatMessages.clientHeight + 100;
+                            
+                            if (isAtBottom) {
+                                scrollToBottom(true);
+                            }
+                            
+                            // XỬ LÝ AI PHẢN HỒI - CHỈ CHO USER, KHÔNG CHO ADMIN
+                            // Kiểm tra nếu:
+                            // 1. Tin nhắn không phải của AI
+                            // 2. Tin nhắn không phải của hệ thống
+                            // 3. Tin nhắn là của người dùng (không phải admin)
+                            // 4. Người gửi không phải admin
+                            // 5. AI được bật
+                            
+                            const isMessageFromUser = message.senderId === currentUser.uid;
+                            const isMessageFromAdmin = message.senderId !== currentUser.uid && 
+                                                      message.senderId !== 'ai' && 
+                                                      message.senderId !== 'system';
+                            
+                            // AI CHỈ PHẢN HỒI KHI:
+                            // - Tin nhắn từ người dùng (currentUser)
+                            // - Và người dùng hiện tại KHÔNG phải admin
+                            // - Và tin nhắn chưa được xử lý
+                            if (!isUserAdmin && 
+                                isMessageFromUser && 
+                                !message.isAI && 
+                                message.senderId !== 'ai' && 
+                                message.senderId !== 'system' &&
+                                !processedMessageIds.has(message.id)) {
+                                
+                                // Đánh giá xem AI có được bật không
+                                db.collection('chats').doc(chatId).get()
+                                    .then((chatDoc) => {
+                                        const chatData = chatDoc.data();
+                                        if (chatData.aiEnabled !== false) {
+                                            processedMessageIds.add(message.id);
+                                            
+                                            // Lấy lịch sử tin nhắn để tạo ngữ cảnh
+                                            return db.collection('chats')
+                                                .doc(chatId)
+                                                .collection('messages')
+                                                .orderBy('timestamp', 'asc')
+                                                .get();
+                                        }
+                                    })
+                                    .then((messagesSnapshot) => {
+                                        if (messagesSnapshot) {
+                                            const messages = [];
+                                            messagesSnapshot.forEach((doc) => {
+                                                messages.push({
+                                                    id: doc.id,
+                                                    ...doc.data()
+                                                });
+                                            });
+                                            generateAIResponse(chatId, messages, message);
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        console.error('Error checking AI status:', error);
+                                    });
+                            }
+                        }
+                    });
                 });
+        }
+
+        // Hàm loại bỏ markdown khỏi văn bản
+        function removeMarkdown(text) {
+            if (!text) return text;
+            
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/\*(.*?)\*/g, '$1')
+                .replace(/__(.*?)__/g, '$1')
+                .replace(/~~(.*?)~~/g, '$1')
+                .replace(/`(.*?)`/g, '$1')
+                .replace(/^#+\s+/gm, '')
+                .replace(/^---+$/gm, '')
+                .replace(/^\*+---+$/gm, '')
+                .replace(/^>\s+/gm, '')
+                .replace(/^[\s]*[-*+]\s+/gm, '')
+                .replace(/^\s*\d+\.\s+/gm, '')
+                .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+                .replace(/!\[(.*?)\]\(.*?\)/g, '$1')
+                .replace(/[*_~`#>\-+]/g, '')
+                .replace(/\n\s*\n\s*\n/g, '\n\n')
+                .trim();
+        }
+
+        // Gọi Gemini API để tạo phản hồi
+        async function generateAIResponse(chatId, messages, userMessage) {
+            try {
+                // Lấy lịch sử chat (tối đa 10 tin nhắn gần nhất)
+                const chatHistory = messages.slice(-10).map(msg => {
+                    let sender = '';
+                    if (msg.senderId === currentUser.uid) {
+                        sender = 'Người dùng';
+                    } else if (msg.senderId === 'ai') {
+                        sender = 'AI';
+                    } else if (msg.senderId === 'system') {
+                        sender = 'Hệ thống';
+                    } else {
+                        sender = 'Cộng tác viên';
+                    }
+                    return `${sender}: ${msg.text || ''}`;
+                }).join('\n');
+
+                // Tạo prompt cho AI
+                const prompt = `Bạn là trợ lý AI của SafeSchool, một ứng dụng an toàn học đường. 
+Nhiệm vụ của bạn là hỗ trợ học sinh trong các tình huống khẩn cấp hoặc báo cáo sự việc.
+Hãy trả lời một cách đồng cảm, chuyên nghiệp và cung cấp thông tin hữu ích.
+Nếu là tình huống khẩn cấp, hãy hướng dẫn các bước an toàn và khuyến khích đợi cộng tác viên.
+
+QUAN TRỌNG: KHÔNG sử dụng bất kỳ ký hiệu markdown nào như *, **, #, -, >, v.v. trong câu trả lời. Chỉ sử dụng văn bản thuần túy.
+
+Lịch sử trò chuyện:
+${chatHistory}
+
+Tin nhắn mới nhất từ người dùng: ${userMessage.text || ''}
+
+Hãy trả lời tin nhắn của người dùng một cách phù hợp (chỉ sử dụng văn bản thuần túy, không markdown):`;
+
+                // Gọi Gemini API
+                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 500,
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                let aiResponse = data.candidates[0].content.parts[0].text;
+                
+                // Loại bỏ markdown khỏi phản hồi của AI
+                aiResponse = removeMarkdown(aiResponse);
+
+                // Lưu phản hồi của AI vào Firestore
+                await db.collection('chats').doc(chatId).collection('messages').add({
+                    text: aiResponse,
+                    senderId: 'ai',
+                    senderName: 'AI Trợ lý SafeSchool',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    isAI: true,
+                    inResponseTo: userMessage.id
+                });
+
+                // Cập nhật last message của chat
+                await db.collection('chats').doc(chatId).update({
+                    lastMessage: aiResponse,
+                    lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+            } catch (error) {
+                console.error('Error generating AI response:', error);
+                
+                // Fallback response nếu API lỗi
+                const fallbackResponse = "Xin lỗi, tôi không thể xử lý yêu cầu của bạn lúc này. Vui lòng đợi cộng tác viên hỗ trợ hoặc thử lại sau.";
+                
+                await db.collection('chats').doc(chatId).collection('messages').add({
+                    text: fallbackResponse,
+                    senderId: 'ai',
+                    senderName: 'AI Trợ lý SafeSchool',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    isAI: true,
+                    isError: true
+                });
+            }
         }
 
         // Display a message in the chat
         function displayMessage(message) {
             const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.senderId === currentUser.uid ? 'sent' : 'received'}`;
             
+            // Kiểm tra tin nhắn đã tồn tại chưa
+            if (document.querySelector(`[data-message-id="${message.id}"]`)) {
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.setAttribute('data-message-id', message.id);
+            
+            // Xác định loại tin nhắn
+            if (message.senderId === currentUser.uid) {
+                messageDiv.className = 'message sent';
+            } else if (message.senderId === 'ai' || message.isAI) {
+                messageDiv.className = 'message received ai-message';
+            } else {
+                messageDiv.className = 'message received';
+            }
+            
+            // Hiển thị tên người gửi (nếu không phải user hiện tại và không phải system)
             if (message.senderId !== currentUser.uid && message.senderId !== 'system') {
                 const senderName = document.createElement('div');
                 senderName.className = 'message-sender';
-                senderName.textContent = message.senderName || 'Cộng tác viên';
+                
+                if (message.senderId === 'ai' || message.isAI) {
+                    senderName.innerHTML = '<i class="fas fa-robot"></i> ' + (message.senderName || 'AI Trợ lý');
+                } else {
+                    senderName.textContent = message.senderName || 'Cộng tác viên';
+                }
+                
                 messageDiv.appendChild(senderName);
             }
             
+            // Thêm nội dung tin nhắn
             const messageText = document.createElement('div');
             messageText.className = 'message-text';
-            messageText.textContent = message.text;
+            
+            // Loại bỏ markdown nếu là tin nhắn AI
+            if (message.senderId === 'ai' || message.isAI) {
+                messageText.textContent = removeMarkdown(message.text);
+            } else {
+                messageText.textContent = message.text;
+            }
+            
             messageDiv.appendChild(messageText);
             
             // Display image if exists
@@ -1228,6 +1614,7 @@
                 messageImage.className = 'message-image';
                 messageImage.src = message.image;
                 messageImage.alt = 'Hình ảnh tin nhắn';
+                messageImage.loading = 'lazy'; // Lazy load cho ảnh
                 messageDiv.appendChild(messageImage);
             }
             
@@ -1248,10 +1635,8 @@
             const diff = now.getTime() - date.getTime();
             
             if (diff < 24 * 60 * 60 * 1000) {
-                // Less than 24 hours ago
                 return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
             } else {
-                // More than 24 hours ago
                 return date.toLocaleDateString('vi-VN');
             }
         }
@@ -1272,7 +1657,6 @@
         document.getElementById('imageInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                // Compress and convert image to base64
                 compressImage(file, 720, 0.7, function(compressedImage) {
                     selectedImage = compressedImage;
                     sendMessage(compressedImage);
@@ -1383,7 +1767,6 @@
 
         // Clean up on page unload
         window.addEventListener('beforeunload', function() {
-            // Remove all listeners
             Object.values(messageListeners).forEach(unsubscribe => {
                 if (unsubscribe) unsubscribe();
             });
@@ -1391,17 +1774,13 @@
 
         // Handle initial chat selection from URL or localStorage
         window.addEventListener('load', function() {
-            // First try to get chatId from URL
             const urlParams = new URLSearchParams(window.location.search);
             const chatIdFromUrl = urlParams.get('chatId');
-            
-            // Then try from localStorage
             const chatIdFromStorage = localStorage.getItem('selectedChatId');
             
             let targetChatId = chatIdFromUrl || chatIdFromStorage;
             
             if (targetChatId) {
-                // Wait for chats to load
                 const checkChatInterval = setInterval(() => {
                     if (chats.length > 0) {
                         clearInterval(checkChatInterval);
@@ -1410,11 +1789,9 @@
                         if (targetChat) {
                             selectChat(targetChat);
                             
-                            // Clear storage after successful navigation
                             localStorage.removeItem('selectedChatId');
                             localStorage.removeItem('selectedChatName');
                             
-                            // Update URL without the parameter
                             if (chatIdFromUrl) {
                                 window.history.replaceState({}, document.title, window.location.pathname);
                             }
@@ -1422,7 +1799,6 @@
                     }
                 }, 100);
                 
-                // Timeout after 5 seconds
                 setTimeout(() => {
                     clearInterval(checkChatInterval);
                 }, 5000);
@@ -1431,4 +1807,3 @@
     </script>
 </body>
 </html>
-
