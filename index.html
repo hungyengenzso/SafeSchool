@@ -1839,67 +1839,80 @@
                 return;
             }
 
-            const chatId = 'KC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
-            const chatName = `KC-${selectedEmergencyType}-${chatId.substr(3, 8)}`;
-            
-            db.collection('chats').doc(chatId).set({
-                name: chatName,
-                participants: [currentUser.uid, adminUserId],
-                createdBy: currentUser.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastMessage: `Báo cáo khẩn cấp: ${selectedEmergencyType}`,
-                lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
-                isEmergency: true,
-                emergencyData: {
-                    type: selectedEmergencyType,
-                    location: currentLocation,
-                    timestamp: new Date(),
-                    reporter: currentUser.uid,
-                    status: 'active'
-                },
-                participantNames: {
-                    [currentUser.uid]: currentUser.displayName || currentUser.email,
-                    [adminUserId]: 'Cộng Tác Viên Safeschool'
-                },
-                participantInfo: {
-                    [currentUser.uid]: {
-                        displayName: currentUser.displayName || currentUser.email,
-                        email: currentUser.email,
-                        role: 'user'
-                    },
-                    [adminUserId]: {
-                        displayName: 'Cộng Tác Viên Safeschool',
-                        email: 'admin@admin.com',
-                        role: 'admin'
-                    }
-                }
-            })
-            .then(() => {
-                return db.collection('chats').doc(chatId).collection('messages').add({
-                    text: `🚨 BÁO CÁO KHẨN CẤP\n\nLoại: ${selectedEmergencyType}\nVị trí: ${currentLocation.latitude.toFixed(6)}, ${currentLocation.longitude.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\n\nHệ thống đã kết nối bạn với cộng tác viên.`,
-                    senderId: 'system',
-                    senderName: 'Hệ thống Safeschool',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    isSystem: true
+            // Lấy thông tin người dùng bao gồm số điện thoại
+            db.collection('users').doc(currentUser.uid).get()
+                .then((userDoc) => {
+                    const userData = userDoc.data();
+                    const userPhone = userData?.phone || 'Chưa cập nhật';
+
+                    const chatId = 'KC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+                    const chatName = `KC-${selectedEmergencyType}-${chatId.substr(3, 8)}`;
+                    
+                    db.collection('chats').doc(chatId).set({
+                        name: chatName,
+                        participants: [currentUser.uid, adminUserId],
+                        createdBy: currentUser.uid,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastMessage: `Báo cáo khẩn cấp: ${selectedEmergencyType}`,
+                        lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
+                        isEmergency: true,
+                        emergencyData: {
+                            type: selectedEmergencyType,
+                            location: currentLocation,
+                            timestamp: new Date(),
+                            reporter: currentUser.uid,
+                            reporterPhone: userPhone,
+                            status: 'active'
+                        },
+                        participantNames: {
+                            [currentUser.uid]: currentUser.displayName || currentUser.email,
+                            [adminUserId]: 'Cộng Tác Viên Safeschool'
+                        },
+                        participantInfo: {
+                            [currentUser.uid]: {
+                                displayName: currentUser.displayName || currentUser.email,
+                                email: currentUser.email,
+                                phone: userPhone,
+                                role: 'user'
+                            },
+                            [adminUserId]: {
+                                displayName: 'Cộng Tác Viên Safeschool',
+                                email: 'admin@admin.com',
+                                role: 'admin'
+                            }
+                        }
+                    })
+                    .then(() => {
+                        return db.collection('chats').doc(chatId).collection('messages').add({
+                            text: `🚨 BÁO CÁO KHẨN CẤP\n\nLoại: ${selectedEmergencyType}\nVị trí: ${currentLocation.latitude.toFixed(6)}, ${currentLocation.longitude.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\nNgười báo cáo: ${currentUser.displayName || currentUser.email}\nSố điện thoại: ${userPhone}\n\nHệ thống đã kết nối bạn với cộng tác viên.`,
+                            senderId: 'system',
+                            senderName: 'Hệ thống Safeschool',
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            isSystem: true
+                        });
+                    })
+                    .then(() => {
+                        return db.collection('chats').doc(chatId).collection('messages').add({
+                            text: `Xin chào ${currentUser.displayName || currentUser.email}! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo khẩn cấp của bạn về "${selectedEmergencyType}". Hãy cho tôi biết chi tiết tình huống. Số điện thoại của bạn: ${userPhone}`,
+                            senderId: adminUserId,
+                            senderName: 'Cộng Tác Viên Safeschool',
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    })
+                    .then(() => {
+                        document.getElementById('safetyModal').style.display = 'none';
+                        alert('Đã tạo cuộc trò chuyện khẩn cấp!');
+                        window.location.href = `chatbox.html?chatId=${chatId}`;
+                    })
+                    .catch((error) => {
+                        console.error('Error creating emergency chat:', error);
+                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error getting user data:', error);
+                    alert('Có lỗi xảy ra khi lấy thông tin người dùng. Vui lòng thử lại.');
                 });
-            })
-            .then(() => {
-                return db.collection('chats').doc(chatId).collection('messages').add({
-                    text: `Xin chào! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo khẩn cấp của bạn về "${selectedEmergencyType}". Hãy cho tôi biết chi tiết tình huống.`,
-                    senderId: adminUserId,
-                    senderName: 'Cộng Tác Viên Safeschool',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            })
-            .then(() => {
-                document.getElementById('safetyModal').style.display = 'none';
-                alert('Đã tạo cuộc trò chuyện khẩn cấp!');
-                window.location.href = `chatbox.html?chatId=${chatId}`;
-            })
-            .catch((error) => {
-                console.error('Error creating emergency chat:', error);
-                alert('Có lỗi xảy ra. Vui lòng thử lại.');
-            });
         }
 
         // Close modal when clicking outside

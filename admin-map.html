@@ -1393,6 +1393,10 @@
                                 <span class="detail-label">Email:</span>
                                 <span class="detail-value" id="detailReporterEmail">-</span>
                             </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Số điện thoại:</span>
+                                <span class="detail-value" id="detailReporterPhone">-</span>
+                            </div>
                         </div>
 
                         <div class="detail-section notes-section">
@@ -1756,7 +1760,6 @@
         // Load issues from Firestore
         function loadIssues() {
             db.collection('chats')
-                .where('participants', 'array-contains', currentUser.uid)
                 .onSnapshot((querySnapshot) => {
                     issues = [];
                     querySnapshot.forEach((doc) => {
@@ -2114,9 +2117,11 @@
             if (reporterId && issue.participantInfo && issue.participantInfo[reporterId]) {
                 document.getElementById('detailReporter').textContent = issue.participantInfo[reporterId].displayName || 'Không xác định';
                 document.getElementById('detailReporterEmail').textContent = issue.participantInfo[reporterId].email || 'Không xác định';
+                document.getElementById('detailReporterPhone').textContent = issue.participantInfo[reporterId].phone || 'Không xác định';
             } else {
                 document.getElementById('detailReporter').textContent = 'Không xác định';
                 document.getElementById('detailReporterEmail').textContent = 'Không xác định';
+                document.getElementById('detailReporterPhone').textContent = 'Không xác định';
             }
 
             // Hiển thị ảnh từ báo cáo

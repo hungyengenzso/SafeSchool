@@ -866,25 +866,60 @@
 
         // Find or create admin user
         function findOrCreateAdminUser() {
+            // Tìm user có role 'admin' trước
             db.collection('users')
-                .where('email', '==', 'admin@admin.com')
+                .where('role', '==', 'admin')
                 .get()
                 .then((querySnapshot) => {
-                    if (!querySnapshot.empty) {
-                        querySnapshot.forEach((doc) => {
+                    let foundAdmin = false;
+                    querySnapshot.forEach((doc) => {
+                        if (doc.id !== currentUser.uid) {
                             adminUserId = doc.id;
-                        });
-                    } else {
-                        const adminUserRef = db.collection('users').doc();
-                        adminUserId = adminUserRef.id;
-                        adminUserRef.set({
-                            displayName: 'Cộng Tác Viên Safeschool',
-                            email: 'admin@admin.com',
-                            role: 'admin',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            isAdmin: true
-                        });
+                            foundAdmin = true;
+                        }
+                    });
+                    if (!foundAdmin) {
+                        // Nếu không có admin khác, tìm theo email
+                        db.collection('users')
+                            .where('email', '>=', '@admin.com')
+                            .where('email', '<', '@admin.com\uf8ff')
+                            .get()
+                            .then((emailQuerySnapshot) => {
+                                emailQuerySnapshot.forEach((doc) => {
+                                    if (doc.id !== currentUser.uid) {
+                                        adminUserId = doc.id;
+                                        // Cập nhật role nếu chưa có
+                                        if (!doc.data().role) {
+                                            doc.ref.update({ role: 'admin' });
+                                        }
+                                        foundAdmin = true;
+                                    }
+                                });
+                                if (!foundAdmin) {
+                                    // Nếu không có admin khác, dùng chính currentUser nếu là admin
+                                    db.collection('users').doc(currentUser.uid).get()
+                                        .then((doc) => {
+                                            if (doc.exists && (doc.data().role === 'admin' || currentUser.email.endsWith('@admin.com'))) {
+                                                adminUserId = currentUser.uid;
+                                            } else {
+                                                // Tạo admin mặc định
+                                                const adminUserRef = db.collection('users').doc();
+                                                adminUserId = adminUserRef.id;
+                                                adminUserRef.set({
+                                                    displayName: 'Cộng Tác Viên Safeschool',
+                                                    email: 'admin@admin.com',
+                                                    role: 'admin',
+                                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                                    isAdmin: true
+                                                });
+                                            }
+                                        });
+                                }
+                            });
                     }
+                })
+                .catch((error) => {
+                    console.error('Error finding admin user:', error);
                 });
         }
 
@@ -1151,6 +1186,11 @@
                 throw new Error('Chưa tìm thấy cộng tác viên');
             }
 
+            // Lấy thông tin người dùng bao gồm số điện thoại
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const userData = userDoc.data();
+            const userPhone = userData?.phone || 'Chưa cập nhật';
+
             // Tạo ID cho báo cáo
             const chatId = 'BC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
             const reportCode = chatId.substr(3, 8);
@@ -1174,6 +1214,7 @@
                     location: reportData.location,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     reporter: currentUser.uid,
+                    reporterPhone: userPhone,
                     status: 'active',
                     images: reportData.images
                 },
@@ -1185,6 +1226,7 @@
                     [currentUser.uid]: {
                         displayName: currentUser.displayName || currentUser.email,
                         email: currentUser.email,
+                        phone: userPhone,
                         role: 'user'
                     },
                     [adminUserId]: {
@@ -1197,7 +1239,7 @@
 
             // Add initial report message
             await db.collection('chats').doc(chatId).collection('messages').add({
-                text: `📋 BÁO CÁO SỰ VIỆC\n\nLoại vi phạm: ${reportData.violationType}\nMô tả: ${reportData.description}\nVị trí: ${reportData.location.lat.toFixed(6)}, ${reportData.location.lng.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\n\nHệ thống đã ghi nhận báo cáo của bạn. Cộng tác viên sẽ liên hệ hỗ trợ.`,
+                text: `📋 BÁO CÁO SỰ VIỆC\n\nLoại vi phạm: ${reportData.violationType}\nMô tả: ${reportData.description}\nVị trí: ${reportData.location.lat.toFixed(6)}, ${reportData.location.lng.toFixed(6)}\nThời gian: ${new Date().toLocaleString('vi-VN')}\nNgười báo cáo: ${currentUser.displayName || currentUser.email}\nSố điện thoại: ${userPhone}\n\nHệ thống đã ghi nhận báo cáo của bạn. Cộng tác viên sẽ liên hệ hỗ trợ.`,
                 senderId: 'system',
                 senderName: 'Hệ thống Safeschool',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1206,7 +1248,7 @@
 
             // Add welcome message from admin
             await db.collection('chats').doc(chatId).collection('messages').add({
-                text: `Xin chào! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo của bạn về "${reportData.violationType}". Cảm ơn bạn đã dũng cảm báo cáo. Hãy cho tôi biết thêm chi tiết để chúng tôi có thể hỗ trợ bạn tốt nhất.`,
+                text: `Xin chào ${currentUser.displayName || currentUser.email}! Tôi là cộng tác viên Safeschool. Tôi đã nhận được báo cáo của bạn về "${reportData.violationType}". Cảm ơn bạn đã dũng cảm báo cáo. Hãy cho tôi biết thêm chi tiết để chúng tôi có thể hỗ trợ bạn tốt nhất. Số điện thoại của bạn: ${userPhone}`,
                 senderId: adminUserId,
                 senderName: 'Cộng Tác Viên Safeschool',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()

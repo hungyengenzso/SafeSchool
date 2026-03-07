@@ -1061,7 +1061,6 @@
                 
                 // Kiểm tra xem user có phải admin không
                 checkIfUserIsAdminUser();
-                loadChats();
             } else {
                 window.location.href = 'login.html';
             }
@@ -1077,9 +1076,13 @@
                     } else {
                         isUserAdmin = currentUser.email === 'admin@admin.com';
                     }
+                    // Load chats AFTER determining if user is admin
+                    loadChats();
                 })
                 .catch(() => {
                     isUserAdmin = currentUser.email === 'admin@admin.com';
+                    // Load chats AFTER determining if user is admin
+                    loadChats();
                 });
         }
 
@@ -1103,9 +1106,11 @@
 
         // Load user's chats
         function loadChats() {
-            db.collection('chats')
-                .where('participants', 'array-contains', currentUser.uid)
-                .orderBy('lastMessageTime', 'desc')
+            let query = db.collection('chats');
+            if (!isUserAdmin) {
+                query = query.where('participants', 'array-contains', currentUser.uid);
+            }
+            query.orderBy('lastMessageTime', 'desc')
                 .onSnapshot((querySnapshot) => {
                     chats = [];
                     querySnapshot.forEach((doc) => {
