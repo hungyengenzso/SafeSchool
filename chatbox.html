@@ -1072,15 +1072,15 @@
                 .then((doc) => {
                     if (doc.exists) {
                         const userData = doc.data();
-                        isUserAdmin = userData.email === 'admin@admin.com' || userData.role === 'admin';
+                        isUserAdmin = userData.email === 'sc@admin.com' || userData.role === 'admin';
                     } else {
-                        isUserAdmin = currentUser.email === 'admin@admin.com';
+                        isUserAdmin = currentUser.email === 'sc@admin.com';
                     }
                     // Load chats AFTER determining if user is admin
                     loadChats();
                 })
                 .catch(() => {
-                    isUserAdmin = currentUser.email === 'admin@admin.com';
+                    isUserAdmin = currentUser.email === 'sc@admin.com';
                     // Load chats AFTER determining if user is admin
                     loadChats();
                 });
